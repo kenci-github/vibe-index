@@ -1,0 +1,95 @@
+BUILD PROMPT (v1.0)
+
+We are building an MVP for a mobile-first web app called Vibe Index.
+
+MISSION
+The Vibe Index helps users quickly discover amazing places to eat, drink, relax, experience, or explore based on vibe rather than generic reviews or category labels.
+
+CORE PROBLEM
+People bookmark thousands of TikToks and Reels about cool restaurants, bars, spas, coffee shops, or cultural spots in other cities, and cannot retrieve them when they travel or go out. Existing platforms (Google, TripAdvisor, Yelp, Maps) return generic category-based results that ignore taste, mood, and moment.
+
+CORE MVP JOB-TO-BE-DONE
+“Show me amazing sh*t fast, based on where I am and the vibe I want, so I don’t have to trawl feeds or bookmarks.”
+
+MVP PRIMITIVES
+The MVP must support 3 primitives:
+
+Taste (Vibe) Tags
+— sexy, cozy, chic, loud, dim, kinetic, earthy, elegant, stylish, playful, intimate, etc.
+
+Intent Tags
+— date, solo, group, chill, brunch, spa, manicure, dessert, late-night, etc.
+
+Moment Tags
+— before dinner, rainy day, late-night, Sunday morning, after shopping, etc.
+
+Users should be able to combine primitives to get filtered results.
+
+INPUT DATA
+Each place (restaurant, bar, spa, attraction, etc) will have:
+
+• Name
+• City
+• Neighborhood (if relevant)
+• Thumbnail image (from TikTok or manual upload)
+• Short description
+• Taste tags (multi-select)
+• Intent tags (multi-select)
+• Moment tags (multi-select)
+• TikTok/IG URL (optional)
+• Google Maps URL (optional)
+
+FEATURES FOR MVP
+• City selection (manual or geolocation)
+• Search or browse by vibe/intent/moment
+• Result grid with thumbnails
+• Detail card for each place
+• Ability to view TikTok/IG link
+• Ability to “save” places (bookmark)
+• Lightweight share (copy link)
+
+NON-GOALS FOR MVP (explicitly exclude)
+• Reviews
+• Ratings
+• Booking
+• Payments
+• Social graph
+• Persona or identity modeling
+• Itinerary building
+• Trust verification
+• Vendor onboarding
+• Authority layer
+• Optionality layer
+
+DATA BACKEND
+Use Airtable as the CMS for all places and tags. Airtable schema provided separately.
+
+DESIGN NOTES
+The app should feel:
+• fast
+• visual
+• youthful
+• playful
+• taste-first (not review-first)
+• mobile-native (TikTok energy, not directory energy)
+
+Aesthetic references:
+• Airbnb app
+• Pinterest search
+• TikTok discover
+• Glossier editorial
+• modern, high-contrast, clean
+
+We will replace static input with automation later. For now, manual input is acceptable.
+
+Deliver:
+• Frontend UI
+• Airtable integration
+• Basic search/filtering
+• Bookmark/save
+• Share link
+• Responsive, mobile-first
+
+That is the entire MVP.
+
+END OF PROMPT

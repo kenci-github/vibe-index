@@ -31,6 +31,7 @@ Screenshot your output, compare against reference, fix mismatches, re-screenshot
 ## Env Variables
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=   ← use this (not ANON_KEY)
+NEXT_PUBLIC_BASE_URL=                           ← production URL for OG tags (e.g. https://vibeindex.app)
 
 ## Key Files
 /types/index.ts              — canonical TypeScript types (Place, City, Country, ActiveFilters, tag unions)
@@ -87,8 +88,8 @@ Session 2: [x] Tag filtering working end-to-end
 Session 2+: [x] Multi-city migration — countries/cities tables, places_with_location view,
                 CitySelector, HomeClient rewrite, TagFilter refactor, PlaceCard city/flag display,
                 detail page location string, saved page getSavedPlaces, scripts/db/
-Session 3: [ ] PWA config + mobile polish
-Session 4: [ ] Vercel deploy + production testing
+Session 3: [x] PWA config + mobile polish — manifest, SW, icons, safe areas, overscroll, OG image
+Session 4: [x] Production hardening — security headers, error boundary, OG/Twitter metadata, deploy docs
 
 ## Documentation
 Update files in docs folder after major milestones and updates to the project.

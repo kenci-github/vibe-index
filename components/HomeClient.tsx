@@ -25,21 +25,26 @@ export default function HomeClient({ cities }: HomeClientProps) {
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS)
   const [places, setPlaces] = useState<Place[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  // Prevents the fetch effect from running before localStorage is read on mount
+  const [initialized, setInitialized] = useState(false)
 
-  // Restore city from localStorage on mount
+  // Restore city from localStorage — runs once, then marks initialized
   useEffect(() => {
     const saved = localStorage.getItem(CITY_KEY)
     if (saved) {
+      // Reading from localStorage is a legitimate external system sync — effect is correct here
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveFilters((prev) => ({ ...prev, cityId: saved }))
-    } else {
-      // trigger initial fetch even without a saved city
-      setActiveFilters((prev) => ({ ...prev }))
     }
+    setInitialized(true)
   }, [])
 
-  // Fetch places whenever filters change
+  // Fetch places — only after initialization to avoid double-fetch on mount
   useEffect(() => {
+    if (!initialized) return
     let cancelled = false
+    // Loading state must be set synchronously before the async fetch begins
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true)
     getPlaces(activeFilters).then((data) => {
       if (!cancelled) {
@@ -48,7 +53,7 @@ export default function HomeClient({ cities }: HomeClientProps) {
       }
     })
     return () => { cancelled = true }
-  }, [activeFilters])
+  }, [activeFilters, initialized])
 
   function handleCitySelect(cityId: string | null) {
     if (cityId) {
@@ -56,7 +61,6 @@ export default function HomeClient({ cities }: HomeClientProps) {
     } else {
       localStorage.removeItem(CITY_KEY)
     }
-    // Reset tags when city changes
     setActiveFilters({ cityId, tasteTags: [], intentTags: [], momentTags: [] })
   }
 

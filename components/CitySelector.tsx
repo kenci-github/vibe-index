@@ -40,7 +40,6 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
     if (open && searchRef.current) {
       setTimeout(() => searchRef.current?.focus(), 150)
     }
-    if (!open) setSearch('')
   }, [open])
 
   const selectedCity = cities.find((c) => c.id === selectedCityId)
@@ -68,9 +67,14 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   )
   const groups = Object.values(grouped).sort((a, b) => a.country.name.localeCompare(b.country.name))
 
+  function closeSheet() {
+    setOpen(false)
+    setSearch('')
+  }
+
   function handleSelect(cityId: string | null) {
     onSelect(cityId)
-    setOpen(false)
+    closeSheet()
   }
 
   // Desktop: styled select
@@ -110,7 +114,7 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
 
       {/* Backdrop */}
       <div
-        onClick={() => setOpen(false)}
+        onClick={closeSheet}
         className={cn(
           'fixed inset-0 z-40 bg-black/40 transition-opacity duration-300',
           open ? 'opacity-100' : 'pointer-events-none opacity-0'

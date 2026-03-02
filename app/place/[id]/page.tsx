@@ -6,9 +6,39 @@ import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/BookmarkButton'
 import ShareButton from '@/components/ShareButton'
 import PlaceImage from '@/components/PlaceImage'
+import type { Metadata } from 'next'
 
 interface PlacePageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
+  const { id } = await params
+  const place = await getPlaceById(id)
+  if (!place) return {}
+
+  const title = `${place.name} — Vibe Index`
+  const description =
+    place.description ??
+    `Discover ${place.name} in ${place.city_name}. Find your vibe.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(place.thumbnail_url && {
+        images: [{ url: place.thumbnail_url, width: 800, height: 600, alt: place.name }],
+      }),
+    },
+    twitter: {
+      card: place.thumbnail_url ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      ...(place.thumbnail_url && { images: [place.thumbnail_url] }),
+    },
+  }
 }
 
 export default async function PlacePage({ params }: PlacePageProps) {

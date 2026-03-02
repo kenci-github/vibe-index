@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react'
 import { getPlaceById } from '@/lib/supabase'
 import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/BookmarkButton'
 import ShareButton from '@/components/ShareButton'
+import PlaceImage from '@/components/PlaceImage'
 
 interface PlacePageProps {
   params: Promise<{ id: string }>
@@ -31,13 +31,12 @@ export default async function PlacePage({ params }: PlacePageProps) {
       {/* Hero image */}
       <div className="relative h-[55vh] w-full overflow-hidden bg-gray-200">
         {place.thumbnail_url ? (
-          <Image
+          <PlaceImage
             src={place.thumbnail_url}
             alt={place.name}
-            fill
-            className="object-cover"
             priority
             sizes="100vw"
+            className="object-cover"
           />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />

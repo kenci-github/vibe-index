@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/BookmarkButton'
+import PlaceImage from '@/components/PlaceImage'
 import type { Place } from '@/types'
 
 const FLAG_MAP: Record<string, string> = {
@@ -33,12 +33,11 @@ export default function PlaceCard({ place }: PlaceCardProps) {
       <div className="relative overflow-hidden rounded-2xl bg-gray-100">
         <div className="aspect-[3/4] w-full">
           {place.thumbnail_url ? (
-            <Image
+            <PlaceImage
               src={place.thumbnail_url}
               alt={place.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 50vw, 33vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />

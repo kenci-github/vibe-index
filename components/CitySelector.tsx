@@ -139,7 +139,7 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
               placeholder="Search cities..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+              className="flex-1 bg-transparent text-base text-gray-800 placeholder-gray-400 focus:outline-none"
             />
             {search && (
               <button onClick={() => setSearch('')} className="text-xs text-gray-400">

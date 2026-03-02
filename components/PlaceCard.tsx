@@ -1,16 +1,32 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/BookmarkButton'
-import type { Place } from '@/lib/types'
+import type { Place } from '@/types'
+
+const FLAG_MAP: Record<string, string> = {
+  GB: '🇬🇧',
+  US: '🇺🇸',
+  JP: '🇯🇵',
+  MX: '🇲🇽',
+  FR: '🇫🇷',
+  DE: '🇩🇪',
+  IT: '🇮🇹',
+  CA: '🇨🇦',
+  AU: '🇦🇺',
+  BR: '🇧🇷',
+}
 
 interface PlaceCardProps {
   place: Place
 }
 
 export default function PlaceCard({ place }: PlaceCardProps) {
-  const allTags = [...(place.taste_tags ?? []), ...(place.intent_tags ?? [])].slice(0, 3)
+  const tasteTags = (place.taste_tags ?? []).slice(0, 3)
+  const flag = FLAG_MAP[place.country_code] ?? ''
+  const locationLine = place.neighbourhood
+    ? `${place.neighbourhood} · ${place.city_name} ${flag}`
+    : `${place.city_name} ${flag}`
 
   return (
     <Link href={`/place/${place.id}`} className="group block">
@@ -33,18 +49,13 @@ export default function PlaceCard({ place }: PlaceCardProps) {
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 pt-8">
           <p className="truncate text-sm font-bold text-white">{place.name}</p>
-          {place.neighbourhood && (
-            <div className="mt-0.5 flex items-center gap-1">
-              <MapPin className="h-3 w-3 shrink-0 text-white/70" />
-              <p className="truncate text-xs text-white/70">{place.neighbourhood}</p>
-            </div>
-          )}
+          <p className="mt-0.5 truncate text-xs text-white/70">{locationLine}</p>
         </div>
       </div>
 
-      {allTags.length > 0 && (
+      {tasteTags.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1 px-0.5">
-          {allTags.map((tag) => (
+          {tasteTags.map((tag) => (
             <Badge
               key={tag}
               variant="outline"

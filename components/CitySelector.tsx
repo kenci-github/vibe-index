@@ -1,0 +1,207 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { cn } from '@/lib/utils'
+import type { City, Country } from '@/types'
+
+const FLAG_MAP: Record<string, string> = {
+  GB: '🇬🇧',
+  US: '🇺🇸',
+  JP: '🇯🇵',
+  MX: '🇲🇽',
+  FR: '🇫🇷',
+  DE: '🇩🇪',
+  IT: '🇮🇹',
+  CA: '🇨🇦',
+  AU: '🇦🇺',
+  BR: '🇧🇷',
+}
+
+interface CitySelectorProps {
+  cities: (City & { country: Country })[]
+  selectedCityId: string | null
+  onSelect: (cityId: string | null) => void
+}
+
+export default function CitySelector({ cities, selectedCityId, onSelect }: CitySelectorProps) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [isMobile, setIsMobile] = useState(true)
+  const searchRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  useEffect(() => {
+    if (open && searchRef.current) {
+      setTimeout(() => searchRef.current?.focus(), 150)
+    }
+    if (!open) setSearch('')
+  }, [open])
+
+  const selectedCity = cities.find((c) => c.id === selectedCityId)
+  const triggerLabel = selectedCity
+    ? `${FLAG_MAP[selectedCity.country.code] ?? ''} ${selectedCity.name}`
+    : 'Explore Everywhere'
+
+  const filtered = search.trim()
+    ? cities.filter(
+        (c) =>
+          c.name.toLowerCase().includes(search.toLowerCase()) ||
+          c.country.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : cities
+
+  // Group by country
+  const grouped = filtered.reduce<Record<string, { country: Country; cities: (City & { country: Country })[] }>>(
+    (acc, city) => {
+      const key = city.country.id
+      if (!acc[key]) acc[key] = { country: city.country, cities: [] }
+      acc[key].cities.push(city)
+      return acc
+    },
+    {}
+  )
+  const groups = Object.values(grouped).sort((a, b) => a.country.name.localeCompare(b.country.name))
+
+  function handleSelect(cityId: string | null) {
+    onSelect(cityId)
+    setOpen(false)
+  }
+
+  // Desktop: styled select
+  if (!isMobile) {
+    return (
+      <div className="relative inline-block">
+        <select
+          value={selectedCityId ?? ''}
+          onChange={(e) => handleSelect(e.target.value || null)}
+          className="appearance-none rounded-full border border-gray-200 bg-white py-2 pl-4 pr-8 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent/30"
+        >
+          <option value="">Explore Everywhere</option>
+          {cities.map((city) => (
+            <option key={city.id} value={city.id}>
+              {city.name}, {city.country.name}
+            </option>
+          ))}
+        </select>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+          ▾
+        </span>
+      </div>
+    )
+  }
+
+  // Mobile: bottom sheet
+  return (
+    <>
+      {/* Trigger */}
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-accent/50 active:scale-95"
+      >
+        <span>{triggerLabel}</span>
+        <span className="text-xs text-gray-400">▾</span>
+      </button>
+
+      {/* Backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        className={cn(
+          'fixed inset-0 z-40 bg-black/40 transition-opacity duration-300',
+          open ? 'opacity-100' : 'pointer-events-none opacity-0'
+        )}
+      />
+
+      {/* Sheet */}
+      <div
+        className={cn(
+          'fixed bottom-0 left-0 right-0 z-50 flex max-h-[85dvh] flex-col rounded-t-2xl bg-white shadow-2xl transition-transform duration-300 ease-out',
+          open ? 'translate-y-0' : 'translate-y-full'
+        )}
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center pb-2 pt-3">
+          <div className="h-1 w-10 rounded-full bg-gray-200" />
+        </div>
+
+        {/* Search */}
+        <div className="px-4 pb-3">
+          <div className="flex items-center gap-2 rounded-xl bg-gray-100 px-3 py-2">
+            <span className="text-gray-400 text-sm">🔍</span>
+            <input
+              ref={searchRef}
+              type="text"
+              placeholder="Search cities..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="text-xs text-gray-400">
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* City list */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Explore Everywhere */}
+          <button
+            onClick={() => handleSelect(null)}
+            className={cn(
+              'flex w-full items-center gap-3 px-5 py-3 text-left transition-colors',
+              selectedCityId === null
+                ? 'border-l-2 border-accent bg-accent/5 font-semibold text-accent'
+                : 'text-gray-700 hover:bg-gray-50'
+            )}
+          >
+            <span className="text-lg">🌍</span>
+            <span className="text-sm">Explore Everywhere</span>
+          </button>
+
+          {/* Grouped cities */}
+          {groups.map(({ country, cities: groupCities }) => (
+            <div key={country.id}>
+              <div className="flex items-center gap-2 bg-gray-50 px-5 py-2">
+                <span>{FLAG_MAP[country.code] ?? ''}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">
+                  {country.name}
+                </span>
+              </div>
+              {groupCities.map((city) => {
+                const active = city.id === selectedCityId
+                return (
+                  <button
+                    key={city.id}
+                    onClick={() => handleSelect(city.id)}
+                    className={cn(
+                      'flex w-full items-center px-5 py-3 text-left transition-colors',
+                      active
+                        ? 'border-l-2 border-accent bg-accent/5 font-semibold text-accent'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    )}
+                  >
+                    <span className="text-sm">{city.name}</span>
+                  </button>
+                )
+              })}
+            </div>
+          ))}
+
+          {groups.length === 0 && (
+            <div className="px-5 py-8 text-center text-sm text-gray-400">No cities found</div>
+          )}
+
+          {/* Bottom padding for safe area */}
+          <div className="h-8" />
+        </div>
+      </div>
+    </>
+  )
+}

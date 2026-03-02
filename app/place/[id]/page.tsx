@@ -1,34 +1,24 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, ExternalLink, Share2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react'
+import { getPlaceById } from '@/lib/supabase'
 import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/BookmarkButton'
 import ShareButton from '@/components/ShareButton'
-import type { Place } from '@/lib/types'
 
 interface PlacePageProps {
   params: Promise<{ id: string }>
 }
 
-async function getPlace(id: string): Promise<Place | null> {
-  const { data, error } = await supabase
-    .from('places')
-    .select('*')
-    .eq('id', id)
-    .eq('active', true)
-    .single()
-
-  if (error || !data) return null
-  return data as Place
-}
-
 export default async function PlacePage({ params }: PlacePageProps) {
   const { id } = await params
-  const place = await getPlace(id)
+  const place = await getPlaceById(id)
 
   if (!place) notFound()
+
+  const locationParts = [place.neighbourhood, place.city_name, place.country_name].filter(Boolean)
+  const locationString = locationParts.join(' · ')
 
   const tagGroups = [
     { label: 'Vibe', tags: place.taste_tags ?? [] },
@@ -73,12 +63,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
         {/* Place name overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h1 className="text-2xl font-bold leading-tight text-white">{place.name}</h1>
-          {(place.neighbourhood || place.city) && (
+          {locationString && (
             <div className="mt-1 flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5 text-white/70" />
-              <p className="text-sm text-white/70">
-                {[place.neighbourhood, place.city].filter(Boolean).join(', ')}
-              </p>
+              <p className="text-sm text-white/70">{locationString}</p>
             </div>
           )}
         </div>

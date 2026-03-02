@@ -3,13 +3,13 @@
 ## What This Is
 Mobile-first web app for vibe-based place discovery. TikTok Discover meets
 Airbnb Experiences. Users find places by mood/moment, not category.
-UK-focused MVP, launching with London first.
+Global multi-city app — London, NYC, Tokyo, Paris, Berlin, Milan, Toronto, Melbourne, Mexico City, Rio.
 
 ## Stack
-- Next.js 14 App Router + TypeScript
+- Next.js 15 App Router + TypeScript
 - Tailwind CSS + shadcn/ui
 - Supabase (PostgreSQL) — places data, read-only via anon key
-- localStorage — anonymous bookmarks, no auth
+- localStorage — anonymous bookmarks + selected city, no auth
 - Vercel — hosting
 
 ## Always Do First
@@ -30,27 +30,50 @@ Screenshot your output, compare against reference, fix mismatches, re-screenshot
 
 ## Env Variables
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=   ← use this (not ANON_KEY)
 
 ## Key Files
-/lib/supabase.ts         — Supabase client
-/lib/bookmarks.ts        — localStorage save/unsave/check
+/types/index.ts              — canonical TypeScript types (Place, City, Country, ActiveFilters, tag unions)
+/lib/supabase.ts             — Supabase client + named query functions
+/lib/bookmarks.ts            — localStorage save/unsave/check
+/lib/tags.ts                 — tag arrays and TAG_GROUPS constant
+/components/CitySelector.tsx — bottom sheet city picker (mobile) / select (desktop)
+/components/HomeClient.tsx   — client home: city + tag filter state, fetches places
 /components/PlaceCard.tsx    — main card component
-/components/TagFilter.tsx    — horizontal scrollable tag bar
+/components/TagFilter.tsx    — horizontal scrollable tag bar (ActiveFilters props)
 /components/BottomNav.tsx    — bottom tab navigation
+/scripts/db/                 — migration, restore, and backup SQL scripts
 
-## Data Model (Supabase — places table)
-id, name, city, neighbourhood, description, thumbnail_url,
-taste_tags[], intent_tags[], moment_tags[],
-tiktok_url, google_maps_url, active
+## Data Model (Supabase)
+
+### Tables
+- `countries` — id (uuid), name (text), code (char 2)
+- `cities` — id (uuid), name (text), country_id (uuid FK)
+- `places` — id, name, city (text legacy), city_id (uuid FK), neighbourhood, description,
+             thumbnail_url, taste_tags[], intent_tags[], moment_tags[],
+             tiktok_url, google_maps_url, active
+
+### View: `places_with_location`
+Joins places → cities → countries. Exposes city_name, country_name, country_code.
+All app queries target this view (never `places` directly).
 
 ## Tag Enums
-taste_tags: sexy, cozy, chic, loud, dim, kinetic, earthy, elegant, stylish, playful, intimate
+taste_tags:  sexy, cozy, chic, loud, dim, kinetic, earthy, elegant, stylish, playful, intimate
 intent_tags: date, solo, group, chill, brunch, spa, manicure, dessert, late-night
 moment_tags: before-dinner, rainy-day, late-night, sunday-morning, after-shopping
 
+## Filtering Logic
+- City: `.eq('city_id', ...)` — exact match
+- Tags: `.contains(column, [...])` — AND within category (must have all selected tags)
+- Multiple categories: independent AND conditions
+- Clear resets tag arrays only (not city)
+
+## localStorage Keys
+- `vibe_bookmarks` — JSON array of bookmarked place IDs
+- `vibe-index-city` — selected city ID string (or absent = Explore Everywhere)
+
 ## Screens
-/ → Home, discover and filter
+/ → Home, discover and filter (city + tags)
 /place/[id] → Place detail
 /saved → Bookmarked places
 
@@ -60,10 +83,12 @@ itinerary building, vendor onboarding
 
 ## Session Log
 Session 1: [x] Scaffold + Supabase + all screens working
-Session 2: [ ] Tag filtering working end-to-end
-Session 3: [ ] Place detail + bookmarks complete
-Session 4: [ ] PWA config + mobile polish
-Session 5: [ ] Vercel deploy + production testing
+Session 2: [x] Tag filtering working end-to-end
+Session 2+: [x] Multi-city migration — countries/cities tables, places_with_location view,
+                CitySelector, HomeClient rewrite, TagFilter refactor, PlaceCard city/flag display,
+                detail page location string, saved page getSavedPlaces, scripts/db/
+Session 3: [ ] PWA config + mobile polish
+Session 4: [ ] Vercel deploy + production testing
 
 ## Documentation
-update files in docs folder after major milestones and updates to the project 
+Update files in docs folder after major milestones and updates to the project.

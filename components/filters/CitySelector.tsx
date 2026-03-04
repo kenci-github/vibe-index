@@ -2,20 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
+import { FLAG_MAP } from '@/lib/constants/flags'
 import type { City, Country } from '@/types'
-
-const FLAG_MAP: Record<string, string> = {
-  GB: '🇬🇧',
-  US: '🇺🇸',
-  JP: '🇯🇵',
-  MX: '🇲🇽',
-  FR: '🇫🇷',
-  DE: '🇩🇪',
-  IT: '🇮🇹',
-  CA: '🇨🇦',
-  AU: '🇦🇺',
-  BR: '🇧🇷',
-}
 
 interface CitySelectorProps {
   cities: (City & { country: Country })[]

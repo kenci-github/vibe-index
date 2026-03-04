@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { TAG_GROUPS } from '@/lib/tags'
+import { TAG_GROUPS } from '@/lib/constants/tags'
 import type { ActiveFilters, TasteTag, IntentTag, MomentTag } from '@/types'
 
 interface TagFilterProps {

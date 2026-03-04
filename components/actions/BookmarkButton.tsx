@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { isBookmarked, toggleBookmark } from '@/lib/bookmarks'
+import { isBookmarked, toggleBookmark } from '@/lib/storage/bookmarks'
 
 interface BookmarkButtonProps {
   id: string

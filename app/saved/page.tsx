@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Compass } from 'lucide-react'
-import { getSavedPlaces } from '@/lib/supabase'
-import { getBookmarkIds } from '@/lib/bookmarks'
-import PlaceCard from '@/components/PlaceCard'
+import { getSavedPlaces } from '@/lib/db/supabase'
+import { getBookmarkIds } from '@/lib/storage/bookmarks'
+import PlaceCard from '@/components/places/PlaceCard'
 import type { Place } from '@/types'
 
 export default function SavedPage() {

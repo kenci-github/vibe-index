@@ -1,14 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import TagFilter from '@/components/TagFilter'
-import PlaceCard from '@/components/PlaceCard'
-import CitySelector from '@/components/CitySelector'
-import { getPlaces } from '@/lib/supabase'
+import TagFilter from '@/components/filters/TagFilter'
+import PlaceCard from '@/components/places/PlaceCard'
+import CitySelector from '@/components/filters/CitySelector'
+import { getPlaces } from '@/lib/db/supabase'
+import { CITY_STORAGE_KEY } from '@/lib/storage/bookmarks'
 import { cn } from '@/lib/utils'
 import type { Place, ActiveFilters, City, Country } from '@/types'
-
-const CITY_KEY = 'vibe-index-city'
 
 const EMPTY_FILTERS: ActiveFilters = {
   cityId: null,
@@ -30,7 +29,7 @@ export default function HomeClient({ cities }: HomeClientProps) {
 
   // Restore city from localStorage — runs once, then marks initialized
   useEffect(() => {
-    const saved = localStorage.getItem(CITY_KEY)
+    const saved = localStorage.getItem(CITY_STORAGE_KEY)
     if (saved) {
       // Reading from localStorage is a legitimate external system sync — effect is correct here
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -57,9 +56,9 @@ export default function HomeClient({ cities }: HomeClientProps) {
 
   function handleCitySelect(cityId: string | null) {
     if (cityId) {
-      localStorage.setItem(CITY_KEY, cityId)
+      localStorage.setItem(CITY_STORAGE_KEY, cityId)
     } else {
-      localStorage.removeItem(CITY_KEY)
+      localStorage.removeItem(CITY_STORAGE_KEY)
     }
     setActiveFilters({ cityId, tasteTags: [], intentTags: [], momentTags: [] })
   }

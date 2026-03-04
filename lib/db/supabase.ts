@@ -20,7 +20,9 @@ export async function getPlaces(filters: ActiveFilters): Promise<Place[]> {
   if (filters.intentTags.length) query = query.contains('intent_tags', filters.intentTags)
   if (filters.momentTags.length) query = query.contains('moment_tags', filters.momentTags)
 
-  const { data, error } = await query.order('name')
+  const { data, error } = await query
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false })
   if (error) { console.error('getPlaces error:', error); return [] }
   return (data as Place[]) ?? []
 }

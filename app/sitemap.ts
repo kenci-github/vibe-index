@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getPlaces } from '@/lib/supabase'
+import { getPlaces } from '@/lib/db/supabase'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://vibeindex.app'
 

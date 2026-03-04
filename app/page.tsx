@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { getCities } from '@/lib/supabase'
+import { getCities } from '@/lib/db/supabase'
 import HomeClient from '@/components/HomeClient'
 
 export default async function HomePage() {

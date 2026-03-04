@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react'
-import { getPlaceById } from '@/lib/supabase'
+import { getPlaceById } from '@/lib/db/supabase'
 import { Badge } from '@/components/ui/badge'
-import BookmarkButton from '@/components/BookmarkButton'
-import ShareButton from '@/components/ShareButton'
-import PlaceImage from '@/components/PlaceImage'
+import BookmarkButton from '@/components/actions/BookmarkButton'
+import ShareButton from '@/components/actions/ShareButton'
+import PlaceImage from '@/components/places/PlaceImage'
 import type { Metadata } from 'next'
 
 interface PlacePageProps {

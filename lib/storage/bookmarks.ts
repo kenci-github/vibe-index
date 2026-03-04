@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'vibe_bookmarks'
+export const CITY_STORAGE_KEY = 'vibe-index-city'
 
 export function getBookmarkIds(): string[] {
   if (typeof window === 'undefined') return []

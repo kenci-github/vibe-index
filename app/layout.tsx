@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { DM_Sans } from 'next/font/google'
-import BottomNav from '@/components/BottomNav'
+import BottomNav from '@/components/layout/BottomNav'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -10,7 +10,7 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
   display: 'swap',
 })
-import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
+import ServiceWorkerRegistration from '@/components/layout/ServiceWorkerRegistration'
 import './globals.css'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://vibeindex.app'

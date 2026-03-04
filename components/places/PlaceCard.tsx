@@ -1,21 +1,9 @@
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import BookmarkButton from '@/components/BookmarkButton'
-import PlaceImage from '@/components/PlaceImage'
+import BookmarkButton from '@/components/actions/BookmarkButton'
+import PlaceImage from '@/components/places/PlaceImage'
+import { FLAG_MAP } from '@/lib/constants/flags'
 import type { Place } from '@/types'
-
-const FLAG_MAP: Record<string, string> = {
-  GB: '🇬🇧',
-  US: '🇺🇸',
-  JP: '🇯🇵',
-  MX: '🇲🇽',
-  FR: '🇫🇷',
-  DE: '🇩🇪',
-  IT: '🇮🇹',
-  CA: '🇨🇦',
-  AU: '🇦🇺',
-  BR: '🇧🇷',
-}
 
 interface PlaceCardProps {
   place: Place

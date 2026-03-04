@@ -11,6 +11,7 @@ Global multi-city app — London, NYC, Tokyo, Paris, Berlin, Milan, Toronto, Mel
 - Supabase (PostgreSQL) — places data, read-only via anon key
 - localStorage — anonymous bookmarks + selected city, no auth
 - Vercel — hosting
+- PostHog — analytics (to be wired up)
 
 ## Always Do First
 Invoke the frontend-design skill before writing any frontend code, every session, no exceptions.
@@ -43,16 +44,19 @@ NEXT_PUBLIC_BASE_URL=                           ← production URL for OG tags (
 /components/PlaceCard.tsx    — main card component
 /components/TagFilter.tsx    — horizontal scrollable tag bar (ActiveFilters props)
 /components/BottomNav.tsx    — bottom tab navigation
+/components/VideoEmbed.tsx   — lazy oEmbed video embed (TikTok/IG/YouTube) [to build]
+/components/BookingCTA.tsx   — booking/contact CTA button variants [to build]
 /scripts/db/                 — migration, restore, and backup SQL scripts
 
 ## Data Model (Supabase)
 
 ### Tables
 - `countries` — id (uuid), name (text), code (char 2)
-- `cities` — id (uuid), name (text), country_id (uuid FK)
+- `cities` — id (uuid), name (text), country_id (uuid FK), tagline (text), hero_image_url (text)
 - `places` — id, name, city (text legacy), city_id (uuid FK), neighbourhood, description,
              thumbnail_url, taste_tags[], intent_tags[], moment_tags[],
-             tiktok_url, google_maps_url, active
+             tiktok_url, google_maps_url, booking_url, cta_type, featured (bool), active
+- `submissions` — id, name, email, platform, video_url, city_id, booking_url, description, status, created_at [to build]
 
 ### View: `places_with_location`
 Joins places → cities → countries. Exposes city_name, country_name, country_code.
@@ -68,6 +72,29 @@ moment_tags: before-dinner, rainy-day, late-night, sunday-morning, after-shoppin
 - Tags: `.contains(column, [...])` — AND within category (must have all selected tags)
 - Multiple categories: independent AND conditions
 - Clear resets tag arrays only (not city)
+- Active tag filters should be stored in URL search params (?taste=cozy,chic&intent=date) for shareable links
+
+## Pagination
+- Use Supabase `.range(offset, offset + 19)` — 20 places per page
+- HomeClient tracks offset in state, exposes loadMore()
+- Show "Load more" button at feed bottom with loading spinner
+- Featured places always sort first: `.order('featured', { ascending: false }).order('created_at', { ascending: false })`
+
+## BookingCTA Types
+cta_type enum values and behaviour:
+- `whatsapp`   → wa.me/+{phone} link
+- `opentable`  → opentable.com/... link
+- `fresha`     → fresha.com/... link
+- `website`    → generic external link
+- `phone`      → tel: link
+- `instagram`  → instagram.com/{handle} with DM prompt
+
+## Video Embeds
+- VideoEmbed.tsx handles TikTok, Instagram Reels, YouTube Shorts
+- Default state: thumbnail image + play button overlay (no iframe loaded)
+- On play tap: inject oEmbed iframe, remove overlay
+- oEmbed calls proxied through app/api/oembed/route.ts to avoid CORS
+- Always reserve aspect-ratio: 9/16 container to prevent layout shift
 
 ## localStorage Keys
 - `vibe_bookmarks` — JSON array of bookmarked place IDs
@@ -75,12 +102,38 @@ moment_tags: before-dinner, rainy-day, late-night, sunday-morning, after-shoppin
 
 ## Screens
 / → Home, discover and filter (city + tags)
-/place/[id] → Place detail
-/saved → Bookmarked places
+/place/[id] → Place detail (video embed + booking CTA + related places)
+/saved → Bookmarked places (grouped by city)
+/submit → Creator/provider submission form [to build]
+
+## Analytics Events (PostHog)
+Track these events once PostHog is wired up in app/layout.tsx:
+- city_selected · tag_applied · listing_viewed · video_played
+- bookmark_tapped · share_tapped · booking_cta_tapped
+- submission_started · submission_completed
 
 ## Non-Goals (never build these)
-Reviews, ratings, booking, payments, auth, social graph,
-itinerary building, vendor onboarding
+Reviews, ratings, payments, social graph, itinerary building, vendor onboarding.
+Auth is deferred — add only when cloud-sync of saves is needed.
+
+## Build Priority (next sessions)
+P0 — build now:
+1. VideoEmbed.tsx + app/api/oembed/route.ts
+2. BookingCTA.tsx + add booking_url/cta_type to Supabase places table
+3. Load-more pagination in HomeClient
+4. Dynamic generateMetadata() per listing in app/place/[id]/page.tsx
+
+P1 — build next:
+5. PostHog analytics in app/layout.tsx
+6. URL search params for active tag filters
+7. /submit page + Supabase submissions table + app/api/submit/route.ts
+8. SkeletonCard.tsx loading state in feed
+
+P2 — build soon:
+9. featured boolean column + sort order in Supabase
+10. City editorial header (tagline + hero_image_url in cities table)
+11. Supabase Auth magic link + cloud-synced saved_places table
+12. Related places carousel on /place/[id]
 
 ## Session Log
 Session 1: [x] Scaffold + Supabase + all screens working

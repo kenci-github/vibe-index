@@ -54,4 +54,14 @@
   .pt-safe {
     padding-top: max(env(safe-area-inset-top), 0px);
   }
+
+  .card-airbnb {
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .card-airbnb:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  }
 }

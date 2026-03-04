@@ -29,6 +29,7 @@ export async function getCities(): Promise<(City & { country: Country })[]> {
   const { data, error } = await supabase
     .from('cities')
     .select('*, country:countries(*)')
+    .eq('active', true)
     .order('name')
   if (error) { console.error('getCities error:', error); return [] }
   return (data as (City & { country: Country })[]) ?? []

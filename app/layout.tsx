@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import { DM_Sans } from 'next/font/google'
 import BottomNav from '@/components/BottomNav'
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+})
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import './globals.css'
 
@@ -41,7 +49,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <main className="mx-auto max-w-md">{children}</main>
         <BottomNav />

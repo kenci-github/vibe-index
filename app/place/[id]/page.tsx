@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react'
+import { ArrowLeft, MapPin } from 'lucide-react'
 import { getPlaceById } from '@/lib/db/supabase'
 import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
 import PlaceImage from '@/components/places/PlaceImage'
+import VideoEmbed from '@/components/VideoEmbed'
 import type { Metadata } from 'next'
 
 interface PlacePageProps {
@@ -108,6 +109,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
           <p className="text-base leading-relaxed text-gray-700">{place.description}</p>
         )}
 
+        {/* Video embed */}
+        {place.tiktok_url && (
+          <div className="mt-5">
+            <VideoEmbed url={place.tiktok_url} thumbnail={place.thumbnail_url} />
+          </div>
+        )}
+
         {/* Tags */}
         {tagGroups.length > 0 && (
           <div className="mt-5 space-y-3">
@@ -143,17 +151,6 @@ export default async function PlacePage({ params }: PlacePageProps) {
             >
               <MapPin className="h-4 w-4" />
               Open in Maps
-            </a>
-          )}
-          {place.tiktok_url && (
-            <a
-              href={place.tiktok_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3.5 text-sm font-semibold text-gray-700"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View on TikTok
             </a>
           )}
         </div>

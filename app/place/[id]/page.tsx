@@ -7,7 +7,10 @@ import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
 import PlaceImage from '@/components/places/PlaceImage'
 import VideoEmbed from '@/components/VideoEmbed'
+import dynamic from 'next/dynamic'
 import type { Metadata } from 'next'
+
+const BookingCTA = dynamic(() => import('@/components/places/BookingCTA'))
 
 interface PlacePageProps {
   params: Promise<{ id: string }>
@@ -107,6 +110,17 @@ export default async function PlacePage({ params }: PlacePageProps) {
         {/* Description */}
         {place.description && (
           <p className="text-base leading-relaxed text-gray-700">{place.description}</p>
+        )}
+
+        {/* Booking CTA */}
+        {place.cta_type && (
+          <div className="mt-4">
+            <BookingCTA
+              bookingUrl={place.booking_url}
+              ctaType={place.cta_type}
+              placeName={place.name}
+            />
+          </div>
         )}
 
         {/* Video embed */}

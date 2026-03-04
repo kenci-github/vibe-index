@@ -60,6 +60,8 @@ export type Place = {
   moment_tags: MomentTag[]
   tiktok_url: string | null
   google_maps_url: string | null
+  booking_url: string | null
+  cta_type: string | null
   active: boolean
   created_at: string
 }

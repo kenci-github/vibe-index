@@ -14,7 +14,7 @@ interface CitySelectorProps {
 export default function CitySelector({ cities, selectedCityId, onSelect }: CitySelectorProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const [isMobile, setIsMobile] = useState(true)
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -65,8 +65,8 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
     closeSheet()
   }
 
-  // Desktop: styled select
-  if (!isMobile) {
+  // Desktop: styled select (only after mount — avoids hydration mismatch)
+  if (isMobile === false) {
     return (
       <div className="relative inline-block">
         <select

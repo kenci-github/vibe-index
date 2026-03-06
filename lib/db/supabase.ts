@@ -8,7 +8,7 @@ const key =
 
 export const supabase = createClient(url, key)
 
-export async function getPlaces(filters: ActiveFilters): Promise<Place[]> {
+export async function getPlaces(filters: ActiveFilters, offset: number = 0, limit: number = 20): Promise<Place[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
     .from('places_with_location')
@@ -23,6 +23,7 @@ export async function getPlaces(filters: ActiveFilters): Promise<Place[]> {
   const { data, error } = await query
     .order('featured', { ascending: false })
     .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
   if (error) { console.error('getPlaces error:', error); return [] }
   return (data as Place[]) ?? []
 }

@@ -7,6 +7,7 @@ import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
 import PlaceImage from '@/components/places/PlaceImage'
 import VideoEmbed from '@/components/VideoEmbed'
+import BookingCTA from '@/components/places/BookingCTA'
 import type { Metadata } from 'next'
 
 interface PlacePageProps {
@@ -142,6 +143,11 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
         {/* Action links */}
         <div className="mt-6 flex flex-col gap-3">
+          <BookingCTA
+            bookingUrl={place.booking_url}
+            ctaType={place.cta_type}
+            placeName={place.name}
+          />
           {place.google_maps_url && (
             <a
               href={place.google_maps_url}

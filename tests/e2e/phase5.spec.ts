@@ -147,7 +147,7 @@ test('full user journey: city → filter → card → back', async ({ page }) =>
 
   // Step 5: Go back
   await page.goBack()
-  await page.waitForURL('/', { timeout: 5_000 })
+  await page.waitForURL(/^http:\/\/localhost:3000\/?(\?.*)?$/, { timeout: 5_000 })
 
   // Step 6: Assert we're back on feed and London is still selected
   await waitForFeedLoaded(page)

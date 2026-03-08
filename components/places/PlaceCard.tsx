@@ -32,6 +32,11 @@ export default function PlaceCard({ place }: PlaceCardProps) {
           )}
         </div>
 
+        {place.featured && (
+          <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-white">
+            ✦ Featured
+          </span>
+        )}
         <BookmarkButton id={place.id} className="absolute right-2 top-2" />
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 pt-8">

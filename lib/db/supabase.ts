@@ -57,6 +57,43 @@ export async function getPlaceById(id: string): Promise<Place | null> {
   return data as Place
 }
 
+export async function getRelatedPlaces(placeId: string, limit = 4): Promise<Place[]> {
+  // Fetch minimal source place data so this can run in parallel with getPlaceById
+  const { data: src } = await supabase
+    .from('places_with_location')
+    .select('id, city_id, taste_tags, intent_tags, moment_tags')
+    .eq('id', placeId)
+    .single()
+
+  if (!src || !src.city_id || (!src.taste_tags.length && !src.intent_tags.length && !src.moment_tags.length)) return []
+
+  const { data, error } = await supabase
+    .from('places_with_location')
+    .select('*')
+    .eq('city_id', src.city_id)
+    .eq('active', true)
+    .neq('id', placeId)
+    .limit(limit * 3)
+
+  if (error || !data) return []
+
+  const related = (data as Place[]).filter(p =>
+    src.taste_tags.some((t: string) => p.taste_tags.includes(t as never)) ||
+    src.intent_tags.some((t: string) => p.intent_tags.includes(t as never)) ||
+    src.moment_tags.some((t: string) => p.moment_tags.includes(t as never))
+  )
+
+  return related.slice(0, limit)
+}
+
+export async function getWaitlistCount(cityId: string): Promise<number> {
+  const { count } = await supabase
+    .from('waitlist')
+    .select('id', { count: 'exact', head: true })
+    .eq('city_id', cityId)
+  return count ?? 0
+}
+
 export async function getSavedPlaces(ids: string[]): Promise<Place[]> {
   if (!ids.length) return []
   const { data, error } = await supabase

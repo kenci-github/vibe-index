@@ -8,6 +8,8 @@ export type City = {
   id: string
   name: string
   country_id: string
+  tagline: string | null
+  hero_image_url: string | null
   country?: Country
 }
 
@@ -62,6 +64,7 @@ export type Place = {
   google_maps_url: string | null
   booking_url: string | null
   cta_type: string | null
+  featured: boolean
   active: boolean
   created_at: string
 }

@@ -48,6 +48,12 @@ NEXT_PUBLIC_BASE_URL=                           ← production URL for OG tags (
 /components/BookingCTA.tsx   — booking/contact CTA button variants [to build]
 /scripts/db/                 — migration, restore, and backup SQL scripts
 
+## Implementation Plan
+Full phase delivery plan: docs/implementation/revised-mvp-plan.md
+Current phase prompts:    docs/implementation/phase-implementation-prompts.md
+                          docs/implementation/phase-6-10-prompts.md
+Execute phases in the order defined in Section 4 of the revised plan.
+
 ## Data Model (Supabase)
 
 ### Tables
@@ -143,6 +149,9 @@ Session 2+: [x] Multi-city migration — countries/cities tables, places_with_lo
                 detail page location string, saved page getSavedPlaces, scripts/db/
 Session 3: [x] PWA config + mobile polish — manifest, SW, icons, safe areas, overscroll, OG image
 Session 4: [x] Production hardening — security headers, error boundary, OG/Twitter metadata, deploy docs
+Session 5: [x] Phase 2 complete — BookingCTA, pagination, URL params, skeleton
+Session 5: [x] Phase 2b — PostHog wired up
+Session 6: [x] Phase 5 complete — featured sort, city hero, related places, waitlist
 
 ## Documentation
 Update files in docs folder after major milestones and updates to the project.

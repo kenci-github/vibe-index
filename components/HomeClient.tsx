@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import TagFilter from '@/components/filters/TagFilter'
 import PlaceCard from '@/components/places/PlaceCard'
 import CitySelector from '@/components/filters/CitySelector'
+import CityHero from '@/components/filters/CityHero'
 import { getPlaces } from '@/lib/db/supabase'
 import { CITY_STORAGE_KEY } from '@/lib/storage/bookmarks'
 import { cn } from '@/lib/utils'
@@ -80,6 +81,9 @@ export default function HomeClient({ cities }: HomeClientProps) {
           onSelect={handleCitySelect}
         />
       </div>
+
+      {/* City hero */}
+      <CityHero city={selectedCity ?? null} />
 
       {/* Tag filter */}
       <TagFilter activeTags={activeFilters} onChange={handleTagChange} />

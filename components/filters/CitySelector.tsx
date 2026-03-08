@@ -61,6 +61,8 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   }
 
   function handleSelect(cityId: string | null) {
+    // TODO: if city.active === false, show WaitlistForm instead of selecting
+    // Currently unreachable via normal UI — getCities() returns active cities only
     onSelect(cityId)
     closeSheet()
   }

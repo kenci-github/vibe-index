@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin } from 'lucide-react'
-import { getPlaceById } from '@/lib/db/supabase'
+import { getPlaceById, getRelatedPlaces } from '@/lib/db/supabase'
 import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { id } = await params
-  const place = await getPlaceById(id)
+  const [place, related] = await Promise.all([getPlaceById(id), getRelatedPlaces(id)])
 
   if (!place) notFound()
 
@@ -160,6 +160,42 @@ export default async function PlacePage({ params }: PlacePageProps) {
             </a>
           )}
         </div>
+
+        {/* Related places */}
+        {related.length > 0 && (
+          <div className="mt-8">
+            <p className="mb-3 text-lg font-bold text-gray-900">
+              More like this in {place.city_name}
+            </p>
+            <div className="-mx-4 overflow-x-auto px-4">
+              <div className="flex gap-3 pb-2">
+                {related.map((r) => (
+                  <Link
+                    key={r.id}
+                    href={`/place/${r.id}`}
+                    className="w-48 flex-shrink-0 group block"
+                  >
+                    <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-100">
+                      {r.thumbnail_url ? (
+                        <PlaceImage
+                          src={r.thumbnail_url}
+                          alt={r.name}
+                          sizes="192px"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-2 pt-6">
+                        <p className="truncate text-xs font-bold text-white">{r.name}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

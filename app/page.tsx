@@ -14,7 +14,7 @@ export default async function HomePage() {
         <p className="text-sm text-gray-400">Discover by mood, not category</p>
       </div>
 
-      <Suspense>
+      <Suspense fallback={<div className="h-screen bg-background" />}>
         <HomeClient cities={cities} />
       </Suspense>
     </div>

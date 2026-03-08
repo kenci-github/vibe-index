@@ -144,9 +144,7 @@ P2 — build soon:
 ## Session Log
 Session 1: [x] Scaffold + Supabase + all screens working
 Session 2: [x] Tag filtering working end-to-end
-Session 2+: [x] Multi-city migration — countries/cities tables, places_with_location view,
-                CitySelector, HomeClient rewrite, TagFilter refactor, PlaceCard city/flag display,
-                detail page location string, saved page getSavedPlaces, scripts/db/
+Session 2+: [x] Multi-city migration — countries/cities tables, places_with_location view, CitySelector, HomeClient rewrite, TagFilter refactor, PlaceCard city/flag display,detail page location string, saved page getSavedPlaces, scripts/db/
 Session 3: [x] PWA config + mobile polish — manifest, SW, icons, safe areas, overscroll, OG image
 Session 4: [x] Production hardening — security headers, error boundary, OG/Twitter metadata, deploy docs
 Session 5: [x] Phase 2 complete — BookingCTA, pagination, URL params, skeleton

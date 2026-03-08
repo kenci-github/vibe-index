@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TagFilter from '@/components/filters/TagFilter'
 import PlaceCard from '@/components/places/PlaceCard'
@@ -12,13 +12,10 @@ import { CITY_STORAGE_KEY } from '@/lib/storage/bookmarks'
 import { cn } from '@/lib/utils'
 import type { Place, ActiveFilters, City, Country, TasteTag, IntentTag, MomentTag } from '@/types'
 
-interface HomeClientProps {
-  cities: (City & { country: Country })[]
-}
-
 const PAGE_SIZE = 20
 
-export default function HomeClient({ cities }: HomeClientProps) {
+export default function HomeClient() {
+  const [cities, setCities] = useState<(City & { country: Country })[]>([])
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -28,8 +25,8 @@ export default function HomeClient({ cities }: HomeClientProps) {
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  // Prevents the fetch effect from running before localStorage is read on mount
-  const [initialized, setInitialized] = useState(false)
+  // True once the mount effect has completed (prevents filter effect double-fetch on mount)
+  const mountedRef = useRef(false)
 
   // Derive tag arrays from URL params
   const tasteTags = (searchParams.get('taste')?.split(',').filter(Boolean) ?? []) as TasteTag[]
@@ -39,24 +36,36 @@ export default function HomeClient({ cities }: HomeClientProps) {
   // Composed filters object — city from localStorage state, tags from URL
   const activeFilters: ActiveFilters = { cityId, tasteTags, intentTags, momentTags }
 
-  // Restore city from localStorage — runs once, then marks initialized
+  // Mount: read localStorage synchronously, then start cities + places fetches in parallel
   useEffect(() => {
     const saved = localStorage.getItem(CITY_STORAGE_KEY)
-    if (saved) {
-      // Reading from localStorage is a legitimate external system sync — effect is correct here
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCityId(saved)
-    }
-    setInitialized(true)
+    const initialCityId = saved ?? null
+    if (saved) setCityId(saved)
+
+    // Cities: fetched via API route (browser-cached for 1h, no SSR network dependency)
+    fetch('/api/cities').then(r => r.json()).then(setCities).catch(() => {})
+
+    // Places: starts immediately in parallel with cities — uses initialCityId from localStorage
+    let cancelled = false
+    const initialFilters: ActiveFilters = { cityId: initialCityId, tasteTags, intentTags, momentTags }
+    getPlaces(initialFilters, 0, PAGE_SIZE).then((data) => {
+      if (!cancelled) {
+        setAllPlaces(data)
+        if (data.length < PAGE_SIZE) setHasMore(false)
+        setIsLoading(false)
+        mountedRef.current = true
+      }
+    })
+    return () => { cancelled = true }
+  // Mount only — URL params are captured once at load via initialFilters above
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Fetch first page — resets whenever city or tag params change
+  // Re-fetch places when city or tag filters change after mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!initialized) return
+    if (!mountedRef.current) return
     let cancelled = false
-    // Loading state must be set synchronously before the async fetch begins
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true)
     setOffset(0)
     setHasMore(true)
@@ -68,9 +77,8 @@ export default function HomeClient({ cities }: HomeClientProps) {
       }
     })
     return () => { cancelled = true }
-  // activeFilters is derived from cityId + searchParams — depend on primitives only
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cityId, searchParams, initialized])
+  }, [cityId, searchParams])
 
   async function loadMore() {
     setLoadingMore(true)

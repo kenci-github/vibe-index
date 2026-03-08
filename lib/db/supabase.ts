@@ -58,33 +58,29 @@ export async function getPlaceById(id: string): Promise<Place | null> {
   return data as Place
 }
 
-export async function getRelatedPlaces(placeId: string, limit = 4): Promise<Place[]> {
-  // Fetch minimal source place data so this can run in parallel with getPlaceById
-  const { data: src } = await supabase
-    .from('places_with_location')
-    .select('id, city_id, taste_tags, intent_tags, moment_tags')
-    .eq('id', placeId)
-    .single()
+export async function getRelatedPlaces(
+  src: Pick<Place, 'id' | 'city_id' | 'taste_tags' | 'intent_tags' | 'moment_tags'>,
+  limit = 4
+): Promise<Place[]> {
+  if (!src.city_id) return []
 
-  if (!src || !src.city_id || (!src.taste_tags.length && !src.intent_tags.length && !src.moment_tags.length)) return []
+  const tagFilters: string[] = []
+  if (src.taste_tags.length) tagFilters.push(`taste_tags.ov.{${src.taste_tags.join(',')}}`)
+  if (src.intent_tags.length) tagFilters.push(`intent_tags.ov.{${src.intent_tags.join(',')}}`)
+  if (src.moment_tags.length) tagFilters.push(`moment_tags.ov.{${src.moment_tags.join(',')}}`)
+  if (!tagFilters.length) return []
 
   const { data, error } = await supabase
     .from('places_with_location')
     .select('*')
     .eq('city_id', src.city_id)
     .eq('active', true)
-    .neq('id', placeId)
-    .limit(limit * 3)
+    .neq('id', src.id)
+    .or(tagFilters.join(','))
+    .limit(limit)
 
   if (error || !data) return []
-
-  const related = (data as Place[]).filter(p =>
-    src.taste_tags.some((t: string) => p.taste_tags.includes(t as never)) ||
-    src.intent_tags.some((t: string) => p.intent_tags.includes(t as never)) ||
-    src.moment_tags.some((t: string) => p.moment_tags.includes(t as never))
-  )
-
-  return related.slice(0, limit)
+  return data as Place[]
 }
 
 export async function getWaitlistCount(cityId: string): Promise<number> {

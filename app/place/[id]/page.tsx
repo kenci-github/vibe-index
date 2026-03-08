@@ -45,9 +45,9 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { id } = await params
-  const [place, related] = await Promise.all([getPlaceById(id), getRelatedPlaces(id)])
-
+  const place = await getPlaceById(id)
   if (!place) notFound()
+  const related = await getRelatedPlaces(place)
 
   const locationParts = [place.neighbourhood, place.city_name, place.country_name].filter(Boolean)
   const locationString = locationParts.join(' · ')

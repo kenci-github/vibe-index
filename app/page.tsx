@@ -1,10 +1,7 @@
 import { Suspense } from 'react'
-import { getCities } from '@/lib/db/supabase'
 import HomeClient from '@/components/HomeClient'
 
-export default async function HomePage() {
-  const cities = await getCities()
-
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-40 bg-background/95 px-4 pb-2 pt-5 backdrop-blur-sm">
@@ -15,7 +12,7 @@ export default async function HomePage() {
       </div>
 
       <Suspense fallback={<div className="h-screen bg-background" />}>
-        <HomeClient cities={cities} />
+        <HomeClient />
       </Suspense>
     </div>
   )

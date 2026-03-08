@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
     if (!res.ok) return NextResponse.json({ error: 'oEmbed fetch failed' }, { status: 500 })
 
     const data = await res.json()
-    return NextResponse.json(data)
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800' },
+    })
   } catch {
     return NextResponse.json({ error: 'oEmbed fetch failed' }, { status: 500 })
   }

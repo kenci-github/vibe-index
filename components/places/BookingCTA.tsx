@@ -57,8 +57,7 @@ export default function BookingCTA({ bookingUrl, ctaType, placeName }: BookingCT
     <a
       href={config.href}
       {...(config.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold text-white transition active:scale-95"
-      style={{ backgroundColor: '#FF4D4D', minHeight: '44px' }}
+      className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-4 text-[15px] font-semibold tracking-tight text-white transition active:scale-95"
     >
       {config.icon}
       {config.label}

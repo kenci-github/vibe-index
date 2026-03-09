@@ -29,7 +29,7 @@ export default function BookmarkButton({ id, className }: BookmarkButtonProps) {
       onClick={handleClick}
       aria-label={saved ? 'Remove bookmark' : 'Save place'}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-transform active:scale-90',
+        'flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-transform active:scale-90',
         className
       )}
     >

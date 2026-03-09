@@ -18,7 +18,7 @@ export default function PlaceCard({ place }: PlaceCardProps) {
 
   return (
     <Link href={`/place/${place.id}`} className="group block">
-      <div className="relative overflow-hidden rounded-2xl bg-gray-100">
+      <div className="relative overflow-hidden rounded-2xl bg-gray-100 transition-shadow duration-200 hover:shadow-lg">
         <div className="aspect-[3/4] w-full">
           {place.thumbnail_url ? (
             <PlaceImage
@@ -51,7 +51,7 @@ export default function PlaceCard({ place }: PlaceCardProps) {
             <Badge
               key={tag}
               variant="outline"
-              className="border-gray-200 text-[10px] text-gray-500"
+              className="border-gray-200 text-[10px] text-warm-gray-mid"
             >
               {tag}
             </Badge>

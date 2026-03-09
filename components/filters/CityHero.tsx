@@ -13,7 +13,7 @@ export default function CityHero({ city }: CityHeroProps) {
   const hasImage = !!city.hero_image_url
 
   return (
-    <div className="relative mx-4 mt-3 h-28 overflow-hidden rounded-2xl">
+    <div className="relative mx-4 mt-3 h-48 overflow-hidden rounded-2xl">
       {hasImage ? (
         <>
           <Image
@@ -23,7 +23,7 @@ export default function CityHero({ city }: CityHeroProps) {
             className="object-cover"
             sizes="(max-width: 768px) calc(100vw - 32px), 736px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         </>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-accent/5" />

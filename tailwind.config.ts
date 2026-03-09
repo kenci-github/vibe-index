@@ -17,6 +17,10 @@ const config: Config = {
       colors: {
         accent: '#FF4D4D',
         background: '#FAFAFA',
+        'warm-gray': {
+          mid: '#717171',
+          light: '#B0B0B0',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

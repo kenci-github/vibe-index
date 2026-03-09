@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { MapPin } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TagFilter from '@/components/filters/TagFilter'
 import PlaceCard from '@/components/places/PlaceCard'
@@ -134,7 +135,7 @@ export default function HomeClient() {
 
       {/* Result count */}
       <div className="px-4 pb-1 pt-2">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-warm-gray-mid">
           {isLoading ? (
             <span className="animate-pulse">Loading…</span>
           ) : (
@@ -148,10 +149,20 @@ export default function HomeClient() {
       {/* Content */}
       <div className={cn('transition-opacity duration-200', isLoading && 'opacity-50 pointer-events-none')}>
         {!isLoading && allPlaces.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-4 py-20 text-center">
-            <p className="text-2xl">🌆</p>
-            <p className="mt-2 text-base font-semibold text-gray-700">No places found</p>
-            <p className="mt-1 text-sm text-gray-400">Try a different vibe combination</p>
+          <div className="flex flex-col items-center justify-center px-8 py-20 text-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+              <MapPin className="h-7 w-7 text-warm-gray-light" strokeWidth={1.5} />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-[17px] font-semibold text-gray-800">No places found</p>
+              <p className="text-sm text-warm-gray-mid">Try adjusting your filters or explore a different city</p>
+            </div>
+            <button
+              onClick={() => handleTagChange({ cityId, tasteTags: [], intentTags: [], momentTags: [] })}
+              className="mt-1 rounded-full border border-gray-900 px-6 py-2 text-sm font-semibold text-gray-900 transition active:scale-95"
+            >
+              Clear filters
+            </button>
           </div>
         ) : (
           <div className="px-4 pb-24 pt-3">

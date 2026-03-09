@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FLAG_MAP } from '@/lib/constants/flags'
 import type { City, Country } from '@/types'
@@ -149,14 +150,13 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
           <button
             onClick={() => handleSelect(null)}
             className={cn(
-              'flex w-full items-center gap-3 px-5 py-3 text-left transition-colors',
-              selectedCityId === null
-                ? 'border-l-2 border-accent bg-accent/5 font-semibold text-accent'
-                : 'text-gray-700 hover:bg-gray-50'
+              'flex w-full items-center gap-3 px-5 py-3.5 text-left transition-colors',
+              selectedCityId === null ? 'bg-accent/5 font-semibold text-accent' : 'text-gray-700 hover:bg-gray-50'
             )}
           >
             <span className="text-lg">🌍</span>
-            <span className="text-sm">Explore Everywhere</span>
+            <span className="flex-1 text-sm">Explore Everywhere</span>
+            {selectedCityId === null && <Check className="h-4 w-4 text-accent" />}
           </button>
 
           {/* Grouped cities */}
@@ -175,13 +175,12 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
                     key={city.id}
                     onClick={() => handleSelect(city.id)}
                     className={cn(
-                      'flex w-full items-center px-5 py-3 text-left transition-colors',
-                      active
-                        ? 'border-l-2 border-accent bg-accent/5 font-semibold text-accent'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      'flex w-full items-center px-5 py-3.5 text-left transition-colors',
+                      active ? 'bg-accent/5 font-semibold text-accent' : 'text-gray-700 hover:bg-gray-50'
                     )}
                   >
-                    <span className="text-sm">{city.name}</span>
+                    <span className="flex-1 text-sm">{city.name}</span>
+                    {active && <Check className="h-4 w-4 text-accent" />}
                   </button>
                 )
               })}

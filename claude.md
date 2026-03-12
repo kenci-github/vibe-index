@@ -24,7 +24,7 @@ Screenshot your output, compare against reference, fix mismatches, re-screenshot
 ## Hard Rules
 - Mobile-first. 390px is primary. Scale up, never down.
 - Server components by default. 'use client' only for state/browser APIs.
-- Accent: #FF4D4D. Background: #FAFAFA. Font: Geist.
+- Accent: #C4622D (burnt terracotta). Background: #FAF9F7 (warm off-white). Display font: Cormorant Garamond. Body font: DM Sans.
 - No stars, ratings, or review UI. Ever.
 - Bottom tab nav only. No hamburger menus.
 - Tailwind only. No inline styles.
@@ -150,6 +150,18 @@ Session 4: [x] Production hardening — security headers, error boundary, OG/Twi
 Session 5: [x] Phase 2 complete — BookingCTA, pagination, URL params, skeleton
 Session 5: [x] Phase 2b — PostHog wired up
 Session 6: [x] Phase 5 complete — featured sort, city hero, related places, waitlist
+Session 7: [x] UI/UX redesign — Cormorant Garamond + DM Sans, #C4622D accent, warm palette, editorial mixed grid, redesigned search/chips/cards/tags across all screens
+
+## Design System (Redesigned — Session 7)
+Accent: #C4622D — burnt terracotta
+Background: #FAF9F7 — warm off-white
+Foreground: #1A1814 — warm near-black
+Display font: Cormorant Garamond — headings, wordmark, card titles (var --font-cormorant)
+Body font: DM Sans — UI, labels, descriptions (var --font-dm-sans)
+Card grid: mixed editorial layout — hero card (col-span-2, 16/9) + two-column (3/4) + wide every 5th (21/9)
+Tag pills: bg-accent/10 text-accent (filled low-opacity, not outline)
+Search bar: min-height 52px, white surface with warm shadow, accent ring on focus, ✦ icon
+Interpretation strip: bg-accent/[0.06] with left border-accent, ✦ prefix, result count pill
 
 ## Documentation
 Update files in docs folder after major milestones and updates to the project.

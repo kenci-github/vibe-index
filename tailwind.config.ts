@@ -15,16 +15,17 @@ const config: Config = {
     },
     extend: {
       colors: {
-        accent: '#FF4D4D',
-        background: '#FAFAFA',
+        accent: '#C4622D',
+        background: '#FAF9F7',
+        foreground: '#1A1814',
+        surface: '#FFFFFF',
         'warm-gray': {
-          mid: '#717171',
-          light: '#B0B0B0',
+          mid: '#8C7B72',
+          light: '#B8A89F',
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
-        foreground: 'hsl(var(--foreground))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -43,9 +44,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-geist-mono)', 'monospace'],
-        display: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        mono: ['monospace'],
+        display: ['var(--font-cormorant)', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

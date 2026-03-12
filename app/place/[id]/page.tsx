@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin } from 'lucide-react'
 import { getPlaceById, getRelatedPlaces } from '@/lib/db/supabase'
-import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
 import PlaceImage from '@/components/places/PlaceImage'
@@ -93,7 +92,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
         {/* Place name overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h1 className="text-2xl font-bold leading-tight text-white">{place.name}</h1>
+          <h1 className="font-display text-3xl font-bold leading-tight text-white">{place.name}</h1>
           {locationString && (
             <div className="mt-1 flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5 text-white/70" />
@@ -107,7 +106,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
       <div className="px-4 pt-5">
         {/* Description */}
         {place.description && (
-          <p className="text-base leading-relaxed text-gray-700">{place.description}</p>
+          <p className="text-base leading-relaxed text-foreground">{place.description}</p>
         )}
 
         {/* Video embed */}
@@ -122,18 +121,17 @@ export default async function PlacePage({ params }: PlacePageProps) {
           <div className="mt-5 space-y-3">
             {tagGroups.map(({ label, tags }) => (
               <div key={label}>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-gray-400">
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-warm-gray-mid">
                   {label}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {tags.map((tag) => (
-                    <Badge
+                    <span
                       key={tag}
-                      className="border-gray-200 bg-gray-50 text-xs text-gray-600"
-                      variant="outline"
+                      className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
                     >
                       {tag}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
               </div>
@@ -161,37 +159,85 @@ export default async function PlacePage({ params }: PlacePageProps) {
           )}
         </div>
 
-        {/* Related places */}
+        {/* Related places — peek carousel */}
         {related.length > 0 && (
-          <div className="mt-8">
-            <p className="mb-3 text-lg font-bold text-gray-900">
-              More like this in {place.city_name}
-            </p>
-            <div className="-mx-4 overflow-x-auto px-4">
-              <div className="flex gap-3 pb-2">
-                {related.map((r) => (
-                  <Link
-                    key={r.id}
-                    href={`/place/${r.id}`}
-                    className="w-48 flex-shrink-0 group block"
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-100">
-                      {r.thumbnail_url ? (
-                        <PlaceImage
-                          src={r.thumbnail_url}
-                          alt={r.name}
-                          sizes="192px"
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />
-                      )}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-2 pt-6">
-                        <p className="truncate text-xs font-bold text-white">{r.name}</p>
+          <div className="mt-10">
+            {/* Section header */}
+            <div className="mb-4 flex items-end justify-between px-0">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid">
+                  More like this
+                </p>
+                <p className="font-display text-xl font-bold leading-tight text-foreground">
+                  in {place.city_name}
+                </p>
+              </div>
+              {related.length > 2 && (
+                <p className="pb-0.5 text-xs text-warm-gray-mid sm:hidden">swipe →</p>
+              )}
+            </div>
+
+            {/* Peek carousel */}
+            <div
+              className="-mx-4 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
+              style={{ scrollSnapType: 'x mandatory' }}
+            >
+              <div className="flex gap-4 px-4 pb-3">
+                {related.map((r) => {
+                  const cardTags = (r.taste_tags ?? []).slice(0, 2)
+                  const cardLocation = r.neighbourhood
+                    ? `${r.neighbourhood} · ${r.city_name}`
+                    : r.city_name
+
+                  return (
+                    <Link
+                      key={r.id}
+                      href={`/place/${r.id}`}
+                      className="group block flex-shrink-0"
+                      style={{ minWidth: '72vw', scrollSnapAlign: 'start' }}
+                    >
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-100">
+                        {r.thumbnail_url ? (
+                          <PlaceImage
+                            src={r.thumbnail_url}
+                            alt={r.name}
+                            sizes="72vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-gradient-to-br from-stone-200 to-stone-300" />
+                        )}
+
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+
+                        {/* Tag pills — float above name */}
+                        {cardTags.length > 0 && (
+                          <div className="absolute bottom-10 left-3 flex gap-1.5">
+                            {cardTags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Name + location */}
+                        <div className="absolute inset-x-0 bottom-0 p-3">
+                          <p className="truncate font-display text-base font-bold text-white">
+                            {r.name}
+                          </p>
+                          <p className="mt-0.5 truncate text-xs text-white/65">
+                            {cardLocation}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
           </div>

@@ -21,15 +21,16 @@ import { test, expect, Page } from '@playwright/test'
 
 /** Wait for the place card grid to finish loading (loading indicator gone). */
 async function waitForPlacesLoaded(page: Page) {
-  // The count line switches from "Loading…" pulse to "{n} places worldwide"
-  // Wait until the animated pulse span is gone, or a place card link appears,
-  // or the empty state message appears — whichever comes first.
+  // Wait until either place cards appear OR the empty state heading appears.
+  // Checking for actual content avoids the hydration gap where !pulse fires
+  // before React has rendered anything.
   await page.waitForFunction(
     () => {
-      const pulse = document.querySelector('.animate-pulse')
       const cards = document.querySelectorAll('a[href^="/place/"]')
-      const empty = document.querySelector('p.font-semibold')?.textContent?.includes('No places found')
-      return !pulse || cards.length > 0 || empty
+      const emptyHeading = Array.from(document.querySelectorAll('p')).find(
+        (el) => el.textContent?.includes('Try a different city or loosen the filters')
+      )
+      return cards.length > 0 || !!emptyHeading
     },
     { timeout: 30_000 },
   )
@@ -226,7 +227,7 @@ test('Navigating to /?taste=cozy pre-selects the cozy tag', async ({ page }) => 
 
   // At least 1 place card must be visible, or the empty state must show.
   const cardCount = await countPlaceCards(page)
-  const emptyState = page.locator('text=No places found')
+  const emptyState = page.locator('text=Try a different city or loosen the filters')
   const emptyVisible = await emptyState.isVisible()
 
   expect(cardCount > 0 || emptyVisible).toBe(true)
@@ -252,7 +253,7 @@ test('Highly specific filter combination shows cards or empty state without JS e
   await waitForPlacesLoaded(page)
 
   const cardCount = await countPlaceCards(page)
-  const emptyState = page.locator('p.font-semibold', { hasText: 'No places found' })
+  const emptyState = page.locator('p.font-semibold', { hasText: 'Try a different city or loosen the filters' })
   const emptyVisible = await emptyState.isVisible()
 
   // Either some cards exist or the proper empty state is shown — both are valid.
@@ -260,7 +261,7 @@ test('Highly specific filter combination shows cards or empty state without JS e
 
   // If empty state is visible, the sub-message should also appear.
   if (emptyVisible) {
-    await expect(page.locator('text=Try a different vibe combination')).toBeVisible()
+    await expect(page.locator('text=No places match your current selection')).toBeVisible()
   }
 
   // No uncaught JS errors (filter out known non-critical noise).

@@ -13,7 +13,7 @@ export default function CityHero({ city }: CityHeroProps) {
   const hasImage = !!city.hero_image_url
 
   return (
-    <div className="relative mx-4 mt-3 h-48 overflow-hidden rounded-2xl">
+    <div className="relative mx-4 mt-3 overflow-hidden rounded-2xl">
       {hasImage ? (
         <>
           <Image
@@ -24,21 +24,21 @@ export default function CityHero({ city }: CityHeroProps) {
             sizes="(max-width: 768px) calc(100vw - 32px), 736px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="relative p-4 pt-24">
+            <p className="text-xl font-bold text-white">{flag} {city.name}</p>
+            {city.tagline && (
+              <p className="mt-0.5 text-sm italic text-white/80">{city.tagline}</p>
+            )}
+          </div>
         </>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-accent/5" />
+        <div className="bg-gradient-to-br from-accent/20 to-accent/5 p-4">
+          <p className="text-xl font-bold text-gray-900">{flag} {city.name}</p>
+          {city.tagline && (
+            <p className="mt-0.5 text-sm italic text-gray-500">{city.tagline}</p>
+          )}
+        </div>
       )}
-
-      <div className="absolute bottom-0 left-0 p-4">
-        <p className={`text-xl font-bold ${hasImage ? 'text-white' : 'text-gray-900'}`}>
-          {flag} {city.name}
-        </p>
-        {city.tagline && (
-          <p className={`mt-0.5 text-sm italic ${hasImage ? 'text-white/80' : 'text-gray-500'}`}>
-            {city.tagline}
-          </p>
-        )}
-      </div>
     </div>
   )
 }

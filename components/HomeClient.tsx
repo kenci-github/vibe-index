@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { MapPin, Bookmark } from 'lucide-react'
+import { Compass, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import VibeSearch from '@/components/filters/VibeSearch'
@@ -17,6 +17,17 @@ import { CITY_STORAGE_KEY } from '@/lib/storage/bookmarks'
 import { cn } from '@/lib/utils'
 import type { Place, ActiveFilters, City, Country, TasteTag, IntentTag, MomentTag } from '@/types'
 import type { ParsedQuery } from '@/lib/search/keywords'
+
+function getMatchedTags(place: Place, extracted: ParsedQuery | null): string[] {
+  if (!extracted) { console.log('[getMatchedTags] extracted is null'); return [] }
+  const result = [
+    ...(place.taste_tags ?? []).filter(t => (extracted.taste_tags as string[]).includes(t)),
+    ...(place.intent_tags ?? []).filter(t => (extracted.intent_tags as string[]).includes(t)),
+    ...(place.moment_tags ?? []).filter(t => (extracted.moment_tags as string[]).includes(t)),
+  ]
+  if (result.length === 0) console.log('[getMatchedTags] empty for', place.name, '| extracted:', JSON.stringify(extracted), '| intent_tags:', place.intent_tags, '| moment_tags:', place.moment_tags)
+  return result
+}
 
 const PAGE_SIZE = 20
 
@@ -39,7 +50,6 @@ export default function HomeClient() {
   const [isSearchMode, setIsSearchMode] = useState(false)
   const [searchResults, setSearchResults] = useState<Place[] | null>(null)
   const [interpretedAs, setInterpretedAs] = useState<string | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [extractedQuery, setExtractedQuery] = useState<ParsedQuery | null>(null)
   const [isSearching, setIsSearching] = useState(false)
 
@@ -158,11 +168,14 @@ export default function HomeClient() {
     <div className="flex flex-col min-h-screen bg-background">
       {/* Sticky header */}
       <header className="sticky top-0 z-40 flex items-center justify-between bg-background/95 px-4 pt-safe pt-4 pb-2 backdrop-blur-sm">
-        <h1 className="text-xl font-bold tracking-tight">
-          Vibe<span className="text-accent">.</span>
-        </h1>
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            Vibe Index
+          </h1>
+          <p className="text-[11px] font-light text-warm-gray-mid">Find places by feel</p>
+        </div>
         <Link href="/saved" aria-label="Saved places">
-          <Bookmark className="h-5 w-5 text-gray-500" strokeWidth={1.8} />
+          <Heart className="h-5 w-5 text-warm-gray-mid" strokeWidth={1.6} />
         </Link>
       </header>
 
@@ -223,25 +236,32 @@ export default function HomeClient() {
         <div className={cn('px-4 pb-24 pt-3', isSearching && 'opacity-50 pointer-events-none transition-opacity duration-200')}>
           {searchResults && searchResults.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-4 py-20 text-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                <MapPin className="h-7 w-7 text-warm-gray-light" strokeWidth={1.5} />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/8">
+                <Compass className="h-7 w-7 text-accent" strokeWidth={1.5} />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[17px] font-semibold text-gray-800">No matches found</p>
+                <p className="font-display text-[19px] font-semibold text-foreground">Nothing here yet for that vibe</p>
                 <p className="text-sm text-warm-gray-mid">Try a different search or browse the full feed</p>
               </div>
               <button
                 onClick={clearSearch}
-                className="mt-1 rounded-full border border-gray-900 px-6 py-2 text-sm font-semibold text-gray-900 transition active:scale-95"
+                className="mt-1 rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white transition active:scale-95"
               >
                 Back to browse
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              {(searchResults ?? []).map((place) => (
-                <PlaceCard key={place.id} place={place} />
-              ))}
+              {(searchResults ?? []).map((place, i) => {
+                const isHero = i === 0
+                const isWide = i % 5 === 0 && i !== 0
+                const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
+                return (
+                  <div key={place.id} className={isHero || isWide ? 'col-span-2' : ''}>
+                    <PlaceCard place={place} searchMode={true} matchedTags={getMatchedTags(place, extractedQuery)} variant={variant} />
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
@@ -249,16 +269,16 @@ export default function HomeClient() {
         <div className={cn('transition-opacity duration-200', isLoading && 'opacity-50 pointer-events-none')}>
           {!isLoading && allPlaces.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-8 py-20 text-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                <MapPin className="h-7 w-7 text-warm-gray-light" strokeWidth={1.5} />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/8">
+                <Compass className="h-7 w-7 text-accent" strokeWidth={1.5} />
               </div>
               <div className="space-y-1.5">
-                <p className="text-[17px] font-semibold text-gray-800">No places found</p>
-                <p className="text-sm text-warm-gray-mid">Try adjusting your filters or explore a different city</p>
+                <p className="font-display text-[19px] font-semibold text-foreground">Try a different city or loosen the filters</p>
+                <p className="text-sm text-warm-gray-mid">No places match your current selection</p>
               </div>
               <button
                 onClick={() => handleTagChange({ cityId, tasteTags: [], intentTags: [], momentTags: [] })}
-                className="mt-1 rounded-full border border-gray-900 px-6 py-2 text-sm font-semibold text-gray-900 transition active:scale-95"
+                className="mt-1 rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white transition active:scale-95"
               >
                 Clear filters
               </button>
@@ -268,7 +288,16 @@ export default function HomeClient() {
               <div className="grid grid-cols-2 gap-3">
                 {isLoading && allPlaces.length === 0
                   ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-                  : allPlaces.map((place) => <PlaceCard key={place.id} place={place} />)}
+                  : allPlaces.map((place, i) => {
+                      const isHero = i === 0
+                      const isWide = i % 5 === 0 && i !== 0
+                      const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
+                      return (
+                        <div key={place.id} className={isHero || isWide ? 'col-span-2' : ''}>
+                          <PlaceCard place={place} variant={variant} />
+                        </div>
+                      )
+                    })}
               </div>
 
               {!isLoading && hasMore && (

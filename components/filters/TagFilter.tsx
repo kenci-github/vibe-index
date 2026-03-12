@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils'
 import { TAG_GROUPS } from '@/lib/constants/tags'
 import type { ActiveFilters, TasteTag, IntentTag, MomentTag } from '@/types'
+import HScrollRow from '@/components/ui/HScrollRow'
 
 interface TagFilterProps {
   activeTags: ActiveFilters
@@ -48,7 +49,7 @@ export default function TagFilter({ activeTags, onChange }: TagFilterProps) {
   }
 
   return (
-    <div className="w-full overflow-x-auto scrollbar-none">
+    <HScrollRow>
       <div className="flex w-max gap-4 px-4 pb-2">
         {hasActive && (
           <div className="flex flex-col justify-end pb-0.5">
@@ -88,6 +89,6 @@ export default function TagFilter({ activeTags, onChange }: TagFilterProps) {
           </div>
         ))}
       </div>
-    </div>
+    </HScrollRow>
   )
 }

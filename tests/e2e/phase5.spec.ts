@@ -39,7 +39,7 @@ test('featured places appear first with badge', async ({ page }) => {
   await expect(firstCard).toBeVisible()
 
   // Featured badge is inside the first card
-  const featuredBadge = firstCard.locator('text=✦ Featured')
+  const featuredBadge = firstCard.locator('text=Curated')
   await expect(featuredBadge).toBeVisible()
 
   // There should be at least one non-featured card after the first
@@ -65,7 +65,7 @@ test('city editorial hero shows name and tagline for London', async ({ page }) =
 
   // CityHero strip should be visible above the tag filter
   // It has a fixed height (h-28) and contains the city name
-  const hero = page.locator('div.h-28').first()
+  const hero = page.locator('div.h-48').first()
   await expect(hero).toBeVisible()
 
   // City name is shown inside the hero
@@ -91,7 +91,7 @@ test('related places section appears on place detail page', async ({ page }) => 
     await expect(relatedHeading).toBeVisible()
 
     // At least one related place card links to a place detail page
-    const relatedCards = page.locator('div.flex.gap-3 a[href^="/place/"]')
+    const relatedCards = page.locator('div.flex.gap-4 a[href^="/place/"]')
     await expect(relatedCards.first()).toBeVisible()
 
     // Related cards should not link to the same place

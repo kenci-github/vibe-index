@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, X } from 'lucide-react'
+import { X } from 'lucide-react'
 
 interface VibeSearchProps {
   value: string
@@ -24,21 +24,21 @@ export default function VibeSearch({ value, onChange, onSearch, onClear, isSearc
 
   return (
     <div className="px-4 pt-3 pb-2">
-      <div className="relative flex items-center">
-        <Search className="absolute left-3.5 h-[18px] w-[18px] text-gray-300" strokeWidth={2} />
+      <div className="relative flex items-center rounded-2xl bg-white ring-1 ring-border shadow-[0_2px_12px_rgba(0,0,0,0.07)] focus-within:ring-accent transition-shadow">
+        <span className="absolute left-4 text-[15px] text-accent/60 select-none pointer-events-none">✦</span>
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder='Try "dim cocktails for a second date"'
-          className="w-full rounded-2xl border-2 border-gray-100 bg-white py-3.5 pl-10 pr-10 text-base text-gray-900 placeholder-gray-300 shadow-sm transition-colors focus:border-accent/40 focus:outline-none"
+          className="w-full min-h-[52px] rounded-2xl bg-transparent py-3.5 pl-10 pr-10 text-base text-foreground placeholder:italic placeholder:text-warm-gray-mid/60 focus:outline-none"
         />
         {value && (
           <button
             onClick={handleClear}
             aria-label="Clear search"
-            className="absolute right-3.5 flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-gray-500 transition-colors hover:bg-gray-300"
+            className="absolute right-3.5 flex h-6 w-6 items-center justify-center rounded-full bg-stone-100 text-warm-gray-mid transition-colors hover:bg-stone-200"
           >
             <X className="h-3.5 w-3.5" strokeWidth={2.5} />
           </button>

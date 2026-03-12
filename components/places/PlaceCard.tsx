@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import BookmarkButton from '@/components/actions/BookmarkButton'
 import PlaceImage from '@/components/places/PlaceImage'
 import { FLAG_MAP } from '@/lib/constants/flags'
@@ -7,54 +6,90 @@ import type { Place } from '@/types'
 
 interface PlaceCardProps {
   place: Place
+  searchMode?: boolean
+  matchedTags?: string[]
+  variant?: 'default' | 'hero' | 'wide'
 }
 
-export default function PlaceCard({ place }: PlaceCardProps) {
+export default function PlaceCard({ place, searchMode = false, matchedTags = [], variant = 'default' }: PlaceCardProps) {
   const tasteTags = (place.taste_tags ?? []).slice(0, 3)
   const flag = FLAG_MAP[place.country_code] ?? ''
   const locationLine = place.neighbourhood
     ? `${place.neighbourhood} · ${place.city_name} ${flag}`
     : `${place.city_name} ${flag}`
 
+  const aspectClass =
+    variant === 'hero' ? 'aspect-[16/9]' :
+    variant === 'wide' ? 'aspect-[21/9]' :
+    'aspect-[3/4]'
+
+  const nameSize =
+    variant === 'hero' ? 'text-2xl font-bold' :
+    variant === 'wide' ? 'text-xl font-semibold' :
+    'text-base font-semibold'
+
+  const namePadding =
+    variant === 'hero' ? 'p-4 pt-12' :
+    'p-3 pt-8'
+
   return (
     <Link href={`/place/${place.id}`} className="group block">
-      <div className="relative overflow-hidden rounded-2xl bg-gray-100 transition-shadow duration-200 hover:shadow-lg">
-        <div className="aspect-[3/4] w-full">
+      <div className="relative overflow-hidden rounded-2xl bg-stone-100 transition-shadow duration-200 hover:shadow-lg">
+        <div className={`${aspectClass} w-full`}>
           {place.thumbnail_url ? (
             <PlaceImage
               src={place.thumbnail_url}
               alt={place.name}
-              sizes="(max-width: 768px) 50vw, 33vw"
+              sizes={variant === 'default' ? '(max-width: 768px) 50vw, 33vw' : '(max-width: 768px) 100vw, 50vw'}
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />
+            <div className="h-full w-full bg-gradient-to-br from-stone-200 to-stone-300" />
           )}
         </div>
 
+        {/* Featured badge */}
         {place.featured && (
-          <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-white">
-            ✦ Featured
+          <span className="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-full bg-black/40 px-2 py-0.5 text-[10px] font-medium text-amber-300 backdrop-blur-sm">
+            ● Curated
           </span>
         )}
+
         <BookmarkButton id={place.id} className="absolute right-2 top-2" />
 
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 pt-8">
-          <p className="truncate text-sm font-bold text-white">{place.name}</p>
-          <p className="mt-0.5 truncate text-xs text-white/70">{locationLine}</p>
+        {/* Name overlay */}
+        <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent ${namePadding}`}>
+          <p className={`font-display ${nameSize} leading-tight text-white`}>{place.name}</p>
+          {variant === 'hero' && (
+            <p className="mt-1 text-xs text-white/70">{locationLine}</p>
+          )}
         </div>
       </div>
 
-      {tasteTags.length > 0 && (
+      {/* Below-card info (default + wide only) */}
+      {variant !== 'hero' && (
+        <div className="mt-2 px-0.5">
+          <p className="truncate text-xs text-warm-gray-mid">{locationLine}</p>
+        </div>
+      )}
+
+      {/* Search matched line */}
+      {searchMode && matchedTags.length > 0 && (
+        <p className="mt-1.5 px-0.5 text-xs font-medium text-accent">
+          ✦ Matched for: {matchedTags.map(t => t.replace(/-/g, ' ')).join(' · ')}
+        </p>
+      )}
+
+      {/* Tags — browse mode only */}
+      {!searchMode && tasteTags.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1 px-0.5">
           {tasteTags.map((tag) => (
-            <Badge
+            <span
               key={tag}
-              variant="outline"
-              className="border-gray-200 text-[10px] text-warm-gray-mid"
+              className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-medium text-accent"
             >
               {tag}
-            </Badge>
+            </span>
           ))}
         </div>
       )}

@@ -38,7 +38,7 @@ export default function SavedPage() {
     <div className="min-h-screen bg-background pb-24">
       <div className="px-4 pb-2 pt-5">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold tracking-tight text-gray-900">Your Saved Places</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Your Saved Places</h1>
           {!loading && places.length > 0 && (
             <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
               {places.length}
@@ -55,9 +55,11 @@ export default function SavedPage() {
         </div>
       ) : places.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
-          <p className="text-4xl">🔖</p>
-          <p className="mt-4 text-base font-semibold text-gray-700">Nothing saved yet.</p>
-          <p className="mt-1 text-sm text-gray-400">No saved places yet — tap ♡ on any place to save it</p>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/8">
+            <Compass className="h-7 w-7 text-accent" strokeWidth={1.5} />
+          </div>
+          <p className="mt-4 font-display text-xl font-semibold text-foreground">Nothing saved yet</p>
+          <p className="mt-1 text-sm text-warm-gray-mid">Tap ♡ on any place to collect it</p>
           <Link
             href="/"
             className="mt-6 flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white"
@@ -70,15 +72,21 @@ export default function SavedPage() {
         <div className="pt-3">
           {groups.map(({ cityName, countryCode, places: groupPlaces }) => (
             <div key={cityName}>
-              <div className="sticky top-0 z-10 bg-gray-50 px-4 py-2">
-                <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+              <div className="sticky top-0 z-10 bg-background px-4 py-2">
+                <span className="font-display text-sm font-semibold tracking-wider text-foreground">
                   {FLAG_MAP[countryCode] ? `${FLAG_MAP[countryCode]} ` : ''}{cityName}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3 px-4 py-3">
-                {groupPlaces.map((place) => (
-                  <PlaceCard key={place.id} place={place} />
-                ))}
+                {groupPlaces.map((place, i) => {
+                  const isHero = i === 0
+                  const variant = isHero ? 'hero' : 'default'
+                  return (
+                    <div key={place.id} className={isHero ? 'col-span-2' : ''}>
+                      <PlaceCard place={place} variant={variant} />
+                    </div>
+                  )
+                })}
               </div>
             </div>
           ))}

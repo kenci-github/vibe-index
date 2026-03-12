@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
-import { DM_Sans } from 'next/font/google'
+import { DM_Sans, Cormorant_Garamond } from 'next/font/google'
 import BottomNav from '@/components/layout/BottomNav'
+import ServiceWorkerRegistration from '@/components/layout/ServiceWorkerRegistration'
+import './globals.css'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -10,8 +10,13 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
   display: 'swap',
 })
-import ServiceWorkerRegistration from '@/components/layout/ServiceWorkerRegistration'
-import './globals.css'
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cormorant',
+  display: 'swap',
+})
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://vibeindex.app'
 
@@ -44,12 +49,12 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
-  themeColor: '#FAFAFA',
+  themeColor: '#FAF9F7',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <main className="mx-auto max-w-md">{children}</main>
         <BottomNav />

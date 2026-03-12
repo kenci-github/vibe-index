@@ -8,17 +8,18 @@ export default function InterpretationStrip({ interpretedAs, resultCount, onClea
   if (!interpretedAs) return null
 
   return (
-    <div className="flex items-center justify-between px-4 py-2">
-      <p className="text-sm text-warm-gray-mid">
-        <span className="text-accent">✦</span>{' '}
-        Showing results for:{' '}
-        <span className="font-medium text-gray-700">{interpretedAs}</span>
+    <div className="mx-4 my-2 flex items-center justify-between rounded-xl border-l-2 border-accent bg-accent/[0.06] px-4 py-3">
+      <p className="text-sm font-medium text-accent">
+        ✦ {interpretedAs}
+        <span className="ml-2 inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-white">
+          {resultCount}
+        </span>
       </p>
       <button
         onClick={onClear}
-        className="ml-4 shrink-0 text-xs text-warm-gray-mid underline underline-offset-2 transition-colors hover:text-gray-800"
+        className="ml-4 shrink-0 text-xs text-accent/70 underline underline-offset-2 transition-colors hover:text-accent"
       >
-        ✕ Clear
+        Clear
       </button>
     </div>
   )

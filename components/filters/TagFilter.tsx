@@ -70,7 +70,7 @@ export default function TagFilter({ activeTags, onChange }: TagFilterProps) {
     <div className="pb-1">
       {/* Segment control row */}
       <div className="flex items-center gap-2 px-4 pb-1.5 pt-1">
-        <div className="flex flex-1 gap-1 rounded-full bg-gray-100 p-0.5">
+        <div className="flex flex-1 gap-1 rounded-full bg-accent/[0.06] p-0.5">
           {TAG_GROUPS.map(({ label }) => {
             const count = groupCount(label as GroupLabel)
             const isTab = activeGroup === label
@@ -121,7 +121,7 @@ export default function TagFilter({ activeTags, onChange }: TagFilterProps) {
                   'whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium transition-all',
                   active
                     ? 'border-accent bg-accent text-white'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-accent/50'
+                    : 'border-border bg-white text-warm-gray-mid hover:border-accent/50'
                 )}
               >
                 {tag}

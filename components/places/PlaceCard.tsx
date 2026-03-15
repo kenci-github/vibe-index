@@ -24,9 +24,9 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
     'aspect-[3/4]'
 
   const nameSize =
-    variant === 'hero' ? 'text-2xl font-bold lg:text-base lg:font-semibold' :
-    variant === 'wide' ? 'text-xl font-semibold lg:text-base lg:font-semibold' :
-    'text-base font-semibold'
+    variant === 'hero' ? 'text-[26px] font-bold lg:text-base lg:font-semibold' :
+    variant === 'wide' ? 'text-[22px] font-bold lg:text-base lg:font-semibold' :
+    'text-[16px] font-semibold'
 
   const namePadding =
     variant === 'hero' ? 'p-4 pt-12 lg:p-3 lg:pt-8' :
@@ -57,18 +57,30 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
 
         <BookmarkButton id={place.id} className="absolute right-2 top-2" />
 
-        {/* Name overlay */}
-        <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent ${namePadding}`}>
+        {/* Name + location + tags — all inside overlay */}
+        <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/20 to-transparent ${namePadding}`}>
           <p className={`font-display ${nameSize} leading-tight text-white`}>{place.name}</p>
-          {variant === 'hero' && (
-            <p className="mt-1 text-xs text-white/70">{locationLine}</p>
+          {/* Location — shown in overlay for all variants */}
+          <p className="text-[11px] text-white/72 mb-1.5">📍 {locationLine}</p>
+          {/* Tags — moved inside overlay */}
+          {!searchMode && tasteTags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {tasteTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-accent/80 px-2.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      {/* Below-card info (default + wide; hero shows it only on lg where it reverts to portrait) */}
-      {(variant !== 'hero' || true) && (
-        <div className={variant === 'hero' ? 'hidden lg:block mt-2 px-0.5' : 'mt-2 px-0.5'}>
+      {/* Below-card location — default and wide only */}
+      {variant !== 'hero' && (
+        <div className="mt-2 px-0.5">
           <p className="truncate text-xs text-warm-gray-mid">{locationLine}</p>
         </div>
       )}
@@ -78,20 +90,6 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
         <p className="mt-1.5 px-0.5 text-xs font-medium text-accent">
           ✦ Matched for: {matchedTags.map(t => t.replace(/-/g, ' ')).join(' · ')}
         </p>
-      )}
-
-      {/* Tags — browse mode only */}
-      {!searchMode && tasteTags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1 px-0.5">
-          {tasteTags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[10px] font-medium text-accent"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
       )}
     </Link>
   )

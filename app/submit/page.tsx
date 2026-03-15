@@ -28,7 +28,7 @@ export default function SubmitPage() {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="px-4 pb-2 pt-5">
+      <div className="mx-auto max-w-2xl px-4 pb-2 pt-5">
         <Link href="/" className="mb-4 flex items-center gap-1.5 text-sm text-warm-gray-mid">
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -37,7 +37,7 @@ export default function SubmitPage() {
         <p className="mt-1 text-sm font-light text-warm-gray-mid">Know somewhere worth discovering?</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-5 px-4">
+      <form onSubmit={handleSubmit} className="mx-auto max-w-2xl mt-6 space-y-5 px-4">
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-warm-gray-mid">
             Place name *

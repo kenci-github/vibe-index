@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Cormorant_Garamond } from 'next/font/google'
 import BottomNav from '@/components/layout/BottomNav'
+import TopNav from '@/components/layout/TopNav'
 import ServiceWorkerRegistration from '@/components/layout/ServiceWorkerRegistration'
 import './globals.css'
 
@@ -56,7 +57,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <main className="mx-auto max-w-md">{children}</main>
+        <TopNav />
+        <main>{children}</main>
         <BottomNav />
         <ServiceWorkerRegistration />
       </body>

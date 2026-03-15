@@ -36,7 +36,7 @@ export default function SavedPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <div className="px-4 pb-2 pt-5">
+      <div className="mx-auto max-w-6xl px-4 lg:px-8 pb-2 pt-5">
         <div className="flex items-center gap-2">
           <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Your Saved Places</h1>
           {!loading && places.length > 0 && (
@@ -48,7 +48,7 @@ export default function SavedPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 px-4 pt-3">
+        <div className="mx-auto max-w-6xl grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-4 lg:px-8 pt-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
@@ -69,20 +69,20 @@ export default function SavedPage() {
           </Link>
         </div>
       ) : (
-        <div className="pt-3">
+        <div className="pt-3 mx-auto max-w-6xl">
           {groups.map(({ cityName, countryCode, places: groupPlaces }) => (
             <div key={cityName}>
-              <div className="sticky top-0 z-10 bg-background px-4 py-2">
+              <div className="sticky top-0 z-10 bg-background px-4 lg:px-8 py-2">
                 <span className="font-display text-sm font-semibold tracking-wider text-foreground">
                   {FLAG_MAP[countryCode] ? `${FLAG_MAP[countryCode]} ` : ''}{cityName}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-3 px-4 py-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-4 lg:px-8 py-3">
                 {groupPlaces.map((place, i) => {
                   const isHero = i === 0
                   const variant = isHero ? 'hero' : 'default'
                   return (
-                    <div key={place.id} className={isHero ? 'col-span-2' : ''}>
+                    <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-3 xl:col-span-4' : ''}>
                       <PlaceCard place={place} variant={variant} />
                     </div>
                   )

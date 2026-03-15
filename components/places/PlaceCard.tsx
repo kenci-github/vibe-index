@@ -19,17 +19,17 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
     : `${place.city_name} ${flag}`
 
   const aspectClass =
-    variant === 'hero' ? 'aspect-[16/9]' :
-    variant === 'wide' ? 'aspect-[21/9]' :
+    variant === 'hero' ? 'aspect-[16/9] lg:aspect-[3/4]' :
+    variant === 'wide' ? 'aspect-[21/9] lg:aspect-[3/4]' :
     'aspect-[3/4]'
 
   const nameSize =
-    variant === 'hero' ? 'text-2xl font-bold' :
-    variant === 'wide' ? 'text-xl font-semibold' :
+    variant === 'hero' ? 'text-2xl font-bold lg:text-base lg:font-semibold' :
+    variant === 'wide' ? 'text-xl font-semibold lg:text-base lg:font-semibold' :
     'text-base font-semibold'
 
   const namePadding =
-    variant === 'hero' ? 'p-4 pt-12' :
+    variant === 'hero' ? 'p-4 pt-12 lg:p-3 lg:pt-8' :
     'p-3 pt-8'
 
   return (
@@ -66,9 +66,9 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
         </div>
       </div>
 
-      {/* Below-card info (default + wide only) */}
-      {variant !== 'hero' && (
-        <div className="mt-2 px-0.5">
+      {/* Below-card info (default + wide; hero shows it only on lg where it reverts to portrait) */}
+      {(variant !== 'hero' || true) && (
+        <div className={variant === 'hero' ? 'hidden lg:block mt-2 px-0.5' : 'mt-2 px-0.5'}>
           <p className="truncate text-xs text-warm-gray-mid">{locationLine}</p>
         </div>
       )}

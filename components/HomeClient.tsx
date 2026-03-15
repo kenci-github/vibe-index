@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Compass, Heart } from 'lucide-react'
+import { Compass, Heart, X } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import VibeSearch from '@/components/filters/VibeSearch'
-import QuickChips from '@/components/filters/QuickChips'
+import CategoryChips from '@/components/filters/CategoryChips'
+import FilterSheet from '@/components/filters/FilterSheet'
 import InterpretationStrip from '@/components/filters/InterpretationStrip'
-import TagFilter from '@/components/filters/TagFilter'
 import PlaceCard from '@/components/places/PlaceCard'
 import SkeletonCard from '@/components/places/SkeletonCard'
 import CitySelector from '@/components/filters/CitySelector'
@@ -173,8 +173,9 @@ export default function HomeClient() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* Sticky filter bar */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+
+      {/* ── Mobile sticky bar (hidden lg+) ── */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm lg:hidden">
         <header className="flex items-center justify-between px-4 pt-safe pt-4 pb-2">
           <div>
             <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
@@ -187,7 +188,6 @@ export default function HomeClient() {
           </Link>
         </header>
 
-        {/* Search — hero element */}
         <VibeSearch
           value={searchQuery}
           onChange={setSearchQuery}
@@ -196,21 +196,53 @@ export default function HomeClient() {
           isSearching={isSearching}
         />
 
-        {/* City selector */}
         <div className="px-4 pb-3 pt-1">
-          <CitySelector
-            cities={cities}
-            selectedCityId={cityId}
-            onSelect={handleCitySelect}
-          />
+          <CitySelector cities={cities} selectedCityId={cityId} onSelect={handleCitySelect} />
         </div>
 
-        {/* Quick chips — browse mode only */}
         {!isSearchMode && (
-          <QuickChips onChipSelect={(q) => { setSearchQuery(q); runSearch(q) }} />
+          <>
+            <div className="flex items-center gap-2 pb-2 pr-4">
+              <div className="flex-1 min-w-0">
+                <CategoryChips activeTags={activeFilters} onChange={handleTagChange} />
+              </div>
+              <FilterSheet activeTags={activeFilters} onChange={handleTagChange} />
+            </div>
+            {(activeFilters.tasteTags.length > 0 || activeFilters.intentTags.length > 0 || activeFilters.momentTags.length > 0) && (
+              <div className="overflow-x-auto scrollbar-none border-t border-border/40">
+                <div className="flex items-center gap-2 px-4 py-2">
+                  {([
+                    ...activeFilters.tasteTags.map(t => ({ tag: t as string, type: 'taste' as const })),
+                    ...activeFilters.intentTags.map(t => ({ tag: t as string, type: 'intent' as const })),
+                    ...activeFilters.momentTags.map(t => ({ tag: t as string, type: 'moment' as const })),
+                  ]).map(({ tag, type }) => (
+                    <button
+                      key={`${type}-${tag}`}
+                      onClick={() => {
+                        const next = { ...activeFilters }
+                        if (type === 'taste') next.tasteTags = next.tasteTags.filter(t => t !== tag as TasteTag)
+                        if (type === 'intent') next.intentTags = next.intentTags.filter(t => t !== tag as IntentTag)
+                        if (type === 'moment') next.momentTags = next.momentTags.filter(t => t !== tag as MomentTag)
+                        handleTagChange(next)
+                      }}
+                      className="flex shrink-0 items-center gap-1 rounded-full bg-accent/10 border border-accent/30 px-3 py-1 text-xs font-medium text-accent"
+                    >
+                      {tag.replace(/-/g, ' ')}
+                      <X className="h-3 w-3" />
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handleTagChange({ ...activeFilters, tasteTags: [], intentTags: [], momentTags: [] })}
+                    className="shrink-0 text-xs font-medium text-warm-gray-mid hover:text-foreground transition whitespace-nowrap"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Interpretation strip — search mode only */}
         {isSearchMode && (
           <InterpretationStrip
             interpretedAs={interpretedAs}
@@ -218,15 +250,39 @@ export default function HomeClient() {
             onClear={clearSearch}
           />
         )}
-
-        {/* Tag filter — browse mode only */}
-        {!isSearchMode && (
-          <TagFilter activeTags={activeFilters} onChange={handleTagChange} />
-        )}
       </div>
 
-      {/* City editorial hero — scrolls away */}
-      <CityHero city={selectedCity ?? null} />
+      {/* ── Desktop: sidebar + main ── */}
+      <div className="flex flex-1">
+
+        {/* Desktop sidebar (hidden mobile) */}
+        <aside className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 lg:flex-shrink-0 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5">
+          <VibeSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSearch={runSearch}
+            onClear={clearSearch}
+            isSearching={isSearching}
+          />
+          <CitySelector cities={cities} selectedCityId={cityId} onSelect={handleCitySelect} />
+          {!isSearchMode ? (
+            <>
+              <CategoryChips activeTags={activeFilters} onChange={handleTagChange} wrap />
+              <FilterSheet activeTags={activeFilters} onChange={handleTagChange} inline />
+            </>
+          ) : (
+            <InterpretationStrip
+              interpretedAs={interpretedAs}
+              resultCount={searchResults?.length ?? 0}
+              onClear={clearSearch}
+            />
+          )}
+        </aside>
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          {/* City editorial hero — scrolls away */}
+          <CityHero city={selectedCity ?? null} />
 
       {/* Result count */}
       <div className="px-4 pb-1 pt-2">
@@ -260,13 +316,13 @@ export default function HomeClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {(searchResults ?? []).map((place, i) => {
                 const isHero = i === 0
                 const isWide = i % 5 === 0 && i !== 0
                 const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
                 return (
-                  <div key={place.id} className={isHero || isWide ? 'col-span-2' : ''}>
+                  <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
                     <PlaceCard place={place} searchMode={true} matchedTags={getMatchedTags(place, extractedQuery)} variant={variant} />
                   </div>
                 )
@@ -294,7 +350,7 @@ export default function HomeClient() {
             </div>
           ) : (
             <div className="px-4 pb-24 pt-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {isLoading && allPlaces.length === 0
                   ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
                   : allPlaces.map((place, i) => {
@@ -302,7 +358,7 @@ export default function HomeClient() {
                       const isWide = i % 5 === 0 && i !== 0
                       const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
                       return (
-                        <div key={place.id} className={isHero || isWide ? 'col-span-2' : ''}>
+                        <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
                           <PlaceCard place={place} variant={variant} />
                         </div>
                       )
@@ -325,6 +381,8 @@ export default function HomeClient() {
           )}
         </div>
       )}
+        </div> {/* /flex-1 main content */}
+      </div> {/* /flex flex-1 desktop row */}
     </div>
   )
 }

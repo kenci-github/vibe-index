@@ -216,9 +216,12 @@ test('Navigating to /?taste=cozy pre-selects the cozy tag', async ({ page }) => 
   // The "cozy" tag button should be in active state.
   // Active state classes: border-accent bg-accent text-white
   // aria-pressed="true" is the most reliable selector.
+  // Note: desktop layout renders CategoryChips + sidebar TagFilter + sheet TagFilter,
+  // so multiple matching buttons exist. Use .first() to avoid strict-mode violation.
   const cozyButton = page
     .locator('button[aria-pressed="true"]')
     .filter({ hasText: /^cozy$/i })
+    .first()
 
   await expect(cozyButton).toBeVisible({ timeout: 10_000 })
 

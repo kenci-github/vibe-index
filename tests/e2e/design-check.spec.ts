@@ -84,8 +84,8 @@ test('place detail page uses new design system', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   await page.screenshot({ path: 'tests/screenshots/place-detail.png', fullPage: true })
 
-  // Place name visible
-  const heading = page.locator('h1, [class*="font-bold"], [class*="display"]').first()
+  // Place name visible — use h1 role directly to avoid matching hidden nav elements
+  const heading = page.locator('h1').first()
   await expect(heading).toBeVisible()
 })
 

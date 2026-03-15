@@ -178,13 +178,17 @@ export default function HomeClient() {
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm lg:hidden">
         <header className="flex items-center justify-between px-4 pt-safe pt-4 pb-2">
           <div>
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="font-display text-[26px] font-semibold tracking-tight text-foreground">
               Vibe Index
             </h1>
             <p className="text-[11px] font-light text-warm-gray-mid">Find places by feel</p>
           </div>
-          <Link href="/saved" aria-label="Saved places">
-            <Heart className="h-5 w-5 text-warm-gray-mid" strokeWidth={1.6} />
+          <Link
+            href="/saved"
+            aria-label="Saved places"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white shadow-sm transition hover:border-foreground/20"
+          >
+            <Heart className="h-4 w-4 text-foreground" strokeWidth={1.6} />
           </Link>
         </header>
 
@@ -352,7 +356,16 @@ export default function HomeClient() {
             <div className="px-4 pb-24 pt-3">
               <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {isLoading && allPlaces.length === 0
-                  ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+                  ? Array.from({ length: 6 }).map((_, i) => {
+                      const variant: 'hero' | 'wide' | 'default' =
+                        i === 0 ? 'hero' : (i - 1) % 5 === 4 ? 'wide' : 'default'
+                      const colClass = variant !== 'default' ? 'col-span-2 lg:col-span-1' : ''
+                      return (
+                        <div key={i} className={colClass}>
+                          <SkeletonCard variant={variant} />
+                        </div>
+                      )
+                    })
                   : allPlaces.map((place, i) => {
                       const isHero = i === 0
                       const isWide = i % 5 === 0 && i !== 0

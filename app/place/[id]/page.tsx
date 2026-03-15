@@ -6,6 +6,7 @@ import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
 import PlaceImage from '@/components/places/PlaceImage'
 import VideoEmbed from '@/components/VideoEmbed'
+import PlaceCard from '@/components/places/PlaceCard'
 import BookingCTA from '@/components/places/BookingCTA'
 import type { Metadata } from 'next'
 
@@ -178,66 +179,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
             </div>
 
             {/* Peek carousel */}
-            <div
-              className="-mx-4 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
-              style={{ scrollSnapType: 'x mandatory' }}
-            >
-              <div className="flex gap-4 px-4 pb-3">
-                {related.map((r) => {
-                  const cardTags = (r.taste_tags ?? []).slice(0, 2)
-                  const cardLocation = r.neighbourhood
-                    ? `${r.neighbourhood} · ${r.city_name}`
-                    : r.city_name
-
-                  return (
-                    <Link
-                      key={r.id}
-                      href={`/place/${r.id}`}
-                      className="group block flex-shrink-0"
-                      style={{ minWidth: '72vw', scrollSnapAlign: 'start' }}
-                    >
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-100">
-                        {r.thumbnail_url ? (
-                          <PlaceImage
-                            src={r.thumbnail_url}
-                            alt={r.name}
-                            sizes="72vw"
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="h-full w-full bg-gradient-to-br from-stone-200 to-stone-300" />
-                        )}
-
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-
-                        {/* Tag pills — float above name */}
-                        {cardTags.length > 0 && (
-                          <div className="absolute bottom-10 left-3 flex gap-1.5">
-                            {cardTags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Name + location */}
-                        <div className="absolute inset-x-0 bottom-0 p-3">
-                          <p className="truncate font-display text-base font-bold text-white">
-                            {r.name}
-                          </p>
-                          <p className="mt-0.5 truncate text-xs text-white/65">
-                            {cardLocation}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
+            <div className="-mx-4 overflow-x-auto scroll-smooth [scroll-snap-type:x_mandatory] [&::-webkit-scrollbar]:hidden">
+              <div className="flex gap-3 px-4 pb-3">
+                {related.map((r) => (
+                  <div key={r.id} className="w-40 flex-shrink-0 [scroll-snap-align:start]">
+                    <PlaceCard place={r} variant="default" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

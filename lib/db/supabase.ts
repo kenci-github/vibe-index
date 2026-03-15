@@ -59,16 +59,10 @@ export async function getPlaceById(id: string): Promise<Place | null> {
 }
 
 export async function getRelatedPlaces(
-  src: Pick<Place, 'id' | 'city_id' | 'taste_tags' | 'intent_tags' | 'moment_tags'>,
-  limit = 4
+  src: Pick<Place, 'id' | 'city_id'>,
+  limit = 8
 ): Promise<Place[]> {
   if (!src.city_id) return []
-
-  const tagFilters: string[] = []
-  if (src.taste_tags.length) tagFilters.push(`taste_tags.ov.{${src.taste_tags.join(',')}}`)
-  if (src.intent_tags.length) tagFilters.push(`intent_tags.ov.{${src.intent_tags.join(',')}}`)
-  if (src.moment_tags.length) tagFilters.push(`moment_tags.ov.{${src.moment_tags.join(',')}}`)
-  if (!tagFilters.length) return []
 
   const { data, error } = await supabase
     .from('places_with_location')
@@ -76,7 +70,8 @@ export async function getRelatedPlaces(
     .eq('city_id', src.city_id)
     .eq('active', true)
     .neq('id', src.id)
-    .or(tagFilters.join(','))
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(limit)
 
   if (error || !data) return []

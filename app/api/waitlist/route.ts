@@ -19,11 +19,11 @@ export async function POST(req: NextRequest) {
   const { error } = await admin.from('waitlist').insert({ email, city_id, city_name })
 
   if (error?.code === '23505') {
-    return NextResponse.json({ alreadyJoined: true })
+    return NextResponse.json({ success: false, alreadyJoined: true })
   }
   if (error) {
     console.error('waitlist insert error:', error)
-    return NextResponse.json({ error: 'Insert failed' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Insert failed' }, { status: 500 })
   }
   return NextResponse.json({ success: true })
 }

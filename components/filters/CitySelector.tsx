@@ -114,6 +114,9 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
 
       {/* Sheet */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Select city"
         className={cn(
           'fixed bottom-0 left-0 right-0 z-50 flex max-h-[85dvh] flex-col rounded-t-2xl bg-white shadow-2xl transition-transform duration-300 ease-out',
           open ? 'translate-y-0' : 'translate-y-full'

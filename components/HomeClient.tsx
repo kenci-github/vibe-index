@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Compass, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -19,14 +19,12 @@ import type { Place, ActiveFilters, City, Country, TasteTag, IntentTag, MomentTa
 import type { ParsedQuery } from '@/lib/search/keywords'
 
 function getMatchedTags(place: Place, extracted: ParsedQuery | null): string[] {
-  if (!extracted) { console.log('[getMatchedTags] extracted is null'); return [] }
-  const result = [
+  if (!extracted) return []
+  return [
     ...(place.taste_tags ?? []).filter(t => (extracted.taste_tags as string[]).includes(t)),
     ...(place.intent_tags ?? []).filter(t => (extracted.intent_tags as string[]).includes(t)),
     ...(place.moment_tags ?? []).filter(t => (extracted.moment_tags as string[]).includes(t)),
   ]
-  if (result.length === 0) console.log('[getMatchedTags] empty for', place.name, '| extracted:', JSON.stringify(extracted), '| intent_tags:', place.intent_tags, '| moment_tags:', place.moment_tags)
-  return result
 }
 
 const PAGE_SIZE = 20
@@ -53,11 +51,17 @@ export default function HomeClient() {
   const [extractedQuery, setExtractedQuery] = useState<ParsedQuery | null>(null)
   const [isSearching, setIsSearching] = useState(false)
 
-  // Derive tag arrays from URL params
-  const tasteTags = (searchParams.get('taste')?.split(',').filter(Boolean) ?? []) as TasteTag[]
-  const intentTags = (searchParams.get('intent')?.split(',').filter(Boolean) ?? []) as IntentTag[]
-  const momentTags = (searchParams.get('moment')?.split(',').filter(Boolean) ?? []) as MomentTag[]
-  const activeFilters: ActiveFilters = { cityId, tasteTags, intentTags, momentTags }
+  // Stable string primitives for deps (avoids new array identity on every render)
+  const tasteStr = searchParams.get('taste') ?? ''
+  const intentStr = searchParams.get('intent') ?? ''
+  const momentStr = searchParams.get('moment') ?? ''
+
+  const activeFilters = useMemo<ActiveFilters>(() => ({
+    cityId,
+    tasteTags: tasteStr.split(',').filter(Boolean) as TasteTag[],
+    intentTags: intentStr.split(',').filter(Boolean) as IntentTag[],
+    momentTags: momentStr.split(',').filter(Boolean) as MomentTag[],
+  }), [cityId, tasteStr, intentStr, momentStr])
 
   // Mount: parallel cities + places fetches
   useEffect(() => {
@@ -68,7 +72,12 @@ export default function HomeClient() {
     fetch('/api/cities').then(r => r.json()).then(setCities).catch(() => {})
 
     let cancelled = false
-    const initialFilters: ActiveFilters = { cityId: initialCityId, tasteTags, intentTags, momentTags }
+    const initialFilters: ActiveFilters = {
+      cityId: initialCityId,
+      tasteTags: tasteStr.split(',').filter(Boolean) as TasteTag[],
+      intentTags: intentStr.split(',').filter(Boolean) as IntentTag[],
+      momentTags: momentStr.split(',').filter(Boolean) as MomentTag[],
+    }
     getPlaces(initialFilters, 0, PAGE_SIZE).then((data) => {
       if (!cancelled) {
         setAllPlaces(data)
@@ -82,7 +91,6 @@ export default function HomeClient() {
   }, [])
 
   // Re-fetch on filter changes after mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!mountedRef.current) return
     let cancelled = false
@@ -97,8 +105,7 @@ export default function HomeClient() {
       }
     })
     return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cityId, searchParams])
+  }, [cityId, tasteStr, intentStr, momentStr]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadMore() {
     setLoadingMore(true)
@@ -166,62 +173,64 @@ export default function HomeClient() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* Sticky header */}
-      <header className="sticky top-0 z-40 flex items-center justify-between bg-background/95 px-4 pt-safe pt-4 pb-2 backdrop-blur-sm">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            Vibe Index
-          </h1>
-          <p className="text-[11px] font-light text-warm-gray-mid">Find places by feel</p>
-        </div>
-        <Link href="/saved" aria-label="Saved places">
-          <Heart className="h-5 w-5 text-warm-gray-mid" strokeWidth={1.6} />
-        </Link>
-      </header>
+      {/* Sticky filter bar */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+        <header className="flex items-center justify-between px-4 pt-safe pt-4 pb-2">
+          <div>
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+              Vibe Index
+            </h1>
+            <p className="text-[11px] font-light text-warm-gray-mid">Find places by feel</p>
+          </div>
+          <Link href="/saved" aria-label="Saved places">
+            <Heart className="h-5 w-5 text-warm-gray-mid" strokeWidth={1.6} />
+          </Link>
+        </header>
 
-      {/* Search — hero element */}
-      <VibeSearch
-        value={searchQuery}
-        onChange={setSearchQuery}
-        onSearch={runSearch}
-        onClear={clearSearch}
-        isSearching={isSearching}
-      />
-
-      {/* City selector */}
-      <div className="px-4 pb-3 pt-1">
-        <CitySelector
-          cities={cities}
-          selectedCityId={cityId}
-          onSelect={handleCitySelect}
+        {/* Search — hero element */}
+        <VibeSearch
+          value={searchQuery}
+          onChange={setSearchQuery}
+          onSearch={runSearch}
+          onClear={clearSearch}
+          isSearching={isSearching}
         />
+
+        {/* City selector */}
+        <div className="px-4 pb-3 pt-1">
+          <CitySelector
+            cities={cities}
+            selectedCityId={cityId}
+            onSelect={handleCitySelect}
+          />
+        </div>
+
+        {/* Quick chips — browse mode only */}
+        {!isSearchMode && (
+          <QuickChips onChipSelect={(q) => { setSearchQuery(q); runSearch(q) }} />
+        )}
+
+        {/* Interpretation strip — search mode only */}
+        {isSearchMode && (
+          <InterpretationStrip
+            interpretedAs={interpretedAs}
+            resultCount={searchResults?.length ?? 0}
+            onClear={clearSearch}
+          />
+        )}
+
+        {/* Tag filter — browse mode only */}
+        {!isSearchMode && (
+          <TagFilter activeTags={activeFilters} onChange={handleTagChange} />
+        )}
       </div>
 
-      {/* City editorial hero */}
+      {/* City editorial hero — scrolls away */}
       <CityHero city={selectedCity ?? null} />
-
-      {/* Quick chips — browse mode only */}
-      {!isSearchMode && (
-        <QuickChips onChipSelect={(q) => { setSearchQuery(q); runSearch(q) }} />
-      )}
-
-      {/* Interpretation strip — search mode only */}
-      {isSearchMode && (
-        <InterpretationStrip
-          interpretedAs={interpretedAs}
-          resultCount={searchResults?.length ?? 0}
-          onClear={clearSearch}
-        />
-      )}
-
-      {/* Tag filter — browse mode only */}
-      {!isSearchMode && (
-        <TagFilter activeTags={activeFilters} onChange={handleTagChange} />
-      )}
 
       {/* Result count */}
       <div className="px-4 pb-1 pt-2">
-        <p className="text-xs text-warm-gray-mid">
+        <p className="text-xs text-warm-gray-mid" aria-live="polite" aria-atomic="true">
           {isSearchMode
             ? `${searchResults?.length ?? 0} ${(searchResults?.length ?? 0) === 1 ? 'result' : 'results'}`
             : isLoading

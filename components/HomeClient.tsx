@@ -323,7 +323,7 @@ export default function HomeClient() {
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {(searchResults ?? []).map((place, i) => {
                 const isHero = i === 0
-                const isWide = i % 5 === 0 && i !== 0
+                const isWide = i > 0 && (i - 1) % 5 === 4
                 const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
                 return (
                   <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
@@ -368,7 +368,7 @@ export default function HomeClient() {
                     })
                   : allPlaces.map((place, i) => {
                       const isHero = i === 0
-                      const isWide = i % 5 === 0 && i !== 0
+                      const isWide = i > 0 && (i - 1) % 5 === 4
                       const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
                       return (
                         <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
@@ -382,10 +382,10 @@ export default function HomeClient() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition active:scale-95 disabled:opacity-50"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-semibold text-foreground transition active:scale-95 disabled:opacity-50"
                 >
                   {loadingMore && (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
                   )}
                   {loadingMore ? 'Loading…' : 'Load more places'}
                 </button>

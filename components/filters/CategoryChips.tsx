@@ -104,7 +104,6 @@ export default function CategoryChips({ activeTags, onChange, wrap = false }: Ca
 
   const allItem = (
     <button
-      key="__all__"
       onClick={() => onChange({ ...activeTags, tasteTags: [], intentTags: [], momentTags: [] })}
       aria-label="Show all places"
       className={cn(

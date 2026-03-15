@@ -23,12 +23,15 @@ export default function TopNav() {
 
         {/* Static search pill — display only */}
         <div className="flex-1 max-w-[280px]">
-          <div className="flex items-center gap-2 rounded-full border border-black/[0.12] bg-white px-3 py-1 shadow-sm cursor-pointer hover:border-black/[0.20] transition-colors">
+          <button
+            aria-label="Search places"
+            className="flex w-full items-center gap-2 rounded-full border border-black/[0.12] bg-white px-3 py-1 shadow-sm cursor-pointer hover:border-black/[0.20] transition-colors"
+          >
             <span className="text-accent text-xs">✦</span>
             <span className="text-xs text-warm-gray-mid italic flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
               Explore a vibe / Any city · Any mood
             </span>
-          </div>
+          </button>
         </div>
 
         {/* Nav links + ♡ Saved pill */}

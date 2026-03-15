@@ -35,7 +35,7 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
   return (
     <Link href={`/place/${place.id}`} className="group block">
       <div className="relative overflow-hidden rounded-2xl bg-stone-100 transition-shadow duration-200 hover:shadow-lg">
-        <div className={`${aspectClass} w-full`}>
+        <div className={`relative ${aspectClass} w-full`}>
           {place.thumbnail_url ? (
             <PlaceImage
               src={place.thumbnail_url}

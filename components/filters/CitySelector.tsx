@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FLAG_MAP } from '@/lib/constants/flags'
@@ -92,17 +93,10 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   }
 
   // Mobile: bottom sheet
-  return (
+  // NOTE: backdrop + sheet are portalled to document.body to escape the sticky
+  // header's backdrop-filter stacking context (which would clip fixed children).
+  const sheet = (
     <>
-      {/* Trigger */}
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-accent/50 active:scale-95"
-      >
-        <span>{triggerLabel}</span>
-        <span className="text-xs text-gray-400">▾</span>
-      </button>
-
       {/* Backdrop */}
       <div
         onClick={closeSheet}
@@ -198,6 +192,22 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
           <div className="h-8" />
         </div>
       </div>
+    </>
+  )
+
+  return (
+    <>
+      {/* Trigger */}
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-accent/50 active:scale-95"
+      >
+        <span>{triggerLabel}</span>
+        <span className="text-xs text-gray-400">▾</span>
+      </button>
+
+      {/* Portal backdrop + sheet to body to escape sticky header backdrop-filter stacking context */}
+      {typeof document !== 'undefined' && createPortal(sheet, document.body)}
     </>
   )
 }

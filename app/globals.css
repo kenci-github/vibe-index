@@ -19,6 +19,7 @@
     --input: 35 15% 88%;
     --ring: 28 18% 10%;
     --radius: 0.5rem;
+    --accent: #C4622D;
   }
 
   * {

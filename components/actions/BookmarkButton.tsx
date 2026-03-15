@@ -36,8 +36,8 @@ export default function BookmarkButton({ id, className }: BookmarkButtonProps) {
       <Bookmark
         className="h-4 w-4"
         strokeWidth={2}
-        fill={saved ? '#FF4D4D' : 'none'}
-        stroke={saved ? '#FF4D4D' : '#374151'}
+        fill={saved ? 'var(--accent)' : 'none'}
+        stroke={saved ? 'var(--accent)' : 'currentColor'}
       />
     </button>
   )

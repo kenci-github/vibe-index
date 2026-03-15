@@ -1,7 +1,6 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import HScrollRow from '@/components/ui/HScrollRow'
 import type { ActiveFilters, TasteTag, IntentTag, MomentTag } from '@/types'
 
 interface ChipDef {
@@ -9,6 +8,27 @@ interface ChipDef {
   tasteTags?: TasteTag[]
   intentTags?: IntentTag[]
   momentTags?: MomentTag[]
+}
+
+// Spec §2.2 primary categories
+// Extra entries cover additional chips not in the spec's abbreviated list.
+const CHIP_ICONS: Record<string, string> = {
+  // Spec §2.2 primary categories
+  'Date night':   '🕯️',
+  'Brunch':       '☀️',
+  'Late night':   '🌙',
+  'Cozy':         '🌿',
+  'Solo':         '💆',
+  "Girls' night": '🥂',
+  'Spa':          '💅',
+  'Dessert':      '🍮',
+  // Additional CHIPS array entries
+  'Chic':         '💎',
+  'Elegant':      '🌸',
+  'Playful':      '🎭',
+  'Rainy day':    '🌧️',
+  'Sunday a.m.':  '☕',
+  // 'Manicure' intentionally omitted — falls through to default '✦' fallback
 }
 
 const CHIPS: ChipDef[] = [
@@ -76,35 +96,96 @@ export default function CategoryChips({ activeTags, onChange, wrap = false }: Ca
     active: isChipActive(chip, activeTags),
   }))
 
-  const chipElements = chips.map(({ label, active, ...chip }) => (
+  // All-clear item — shows active state when no filters are selected
+  const noFiltersActive =
+    activeTags.tasteTags.length === 0 &&
+    activeTags.intentTags.length === 0 &&
+    activeTags.momentTags.length === 0
+
+  const allItem = (
+    <button
+      key="__all__"
+      onClick={() => onChange({ ...activeTags, tasteTags: [], intentTags: [], momentTags: [] })}
+      aria-label="Show all places"
+      className={cn(
+        'flex flex-col items-center gap-1.5 px-2 pb-2 pt-1.5 flex-shrink-0 min-w-[52px] border-b-2 transition-all',
+        noFiltersActive ? 'border-foreground' : 'border-transparent'
+      )}
+    >
+      <div className={cn(
+        'flex h-11 w-11 items-center justify-center rounded-full text-xl transition-all',
+        noFiltersActive ? 'bg-foreground' : 'bg-black/5'
+      )}>
+        <span style={noFiltersActive ? { filter: 'grayscale(1) brightness(10)' } : undefined}>
+          🌍
+        </span>
+      </div>
+      <span className={cn(
+        'text-[10px] whitespace-nowrap',
+        noFiltersActive ? 'font-bold text-foreground' : 'font-medium text-warm-gray-mid'
+      )}>
+        All
+      </span>
+    </button>
+  )
+
+  const iconChipElements = chips.map(({ label, active, ...chip }) => (
     <button
       key={label}
       onClick={() => onChange(toggleChip({ label, ...chip }, activeTags))}
       aria-pressed={active}
       className={cn(
-        'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95',
-        active
-          ? 'border-accent bg-accent text-white'
-          : 'border-border bg-background text-warm-gray-mid hover:border-accent/50 hover:text-foreground'
+        'flex flex-col items-center gap-1.5 px-2 pb-2 pt-1.5 flex-shrink-0 min-w-[52px] border-b-2 transition-all',
+        active ? 'border-foreground' : 'border-transparent'
       )}
     >
-      {label}
+      <div className={cn(
+        'flex h-11 w-11 items-center justify-center rounded-full text-xl transition-all',
+        active ? 'bg-foreground' : 'bg-black/5'
+      )}>
+        <span style={active ? { filter: 'grayscale(1) brightness(10)' } : undefined}>
+          {CHIP_ICONS[label] ?? '✦'}
+        </span>
+      </div>
+      <span className={cn(
+        'text-[10px] whitespace-nowrap',
+        active ? 'font-bold text-foreground' : 'font-medium text-warm-gray-mid'
+      )}>
+        {label}
+      </span>
     </button>
   ))
 
+  // Wrap mode — keep existing text pills (sidebar)
   if (wrap) {
     return (
       <div className="flex flex-wrap gap-2">
-        {chipElements}
+        {chips.map(({ label, active, ...chip }) => (
+          <button
+            key={label}
+            onClick={() => onChange(toggleChip({ label, ...chip }, activeTags))}
+            aria-pressed={active}
+            className={cn(
+              'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95',
+              active
+                ? 'border-accent bg-accent text-white'
+                : 'border-border bg-background text-warm-gray-mid hover:border-accent/50 hover:text-foreground'
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
     )
   }
 
+  // Default mode — emoji icon circles with horizontal scroll
   return (
-    <HScrollRow>
-      <div className="inline-flex gap-2 px-4 py-2 pr-8">
-        {chipElements}
+    <div className="overflow-x-auto scrollbar-none -mx-4">
+      <div className="flex px-2">
+        {allItem}
+        {iconChipElements}
       </div>
-    </HScrollRow>
+    </div>
   )
 }

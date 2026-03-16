@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
   { href: '/', label: 'Discover' },
+  { href: '/saved', label: 'Saved' },
   { href: '/submit', label: 'Submit a place' },
 ]
 
@@ -15,27 +15,28 @@ export default function TopNav() {
 
   return (
     <nav className="hidden lg:block sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
-      <div className="mx-auto flex max-w-screen-xl items-center gap-6 px-8 py-2.5">
+      <div className="mx-auto flex h-12 max-w-screen-xl items-center justify-between px-7">
         {/* Wordmark */}
         <span className="font-display text-xl font-semibold tracking-tight text-foreground flex-shrink-0">
           Vibe Index
         </span>
 
-        {/* Static search pill — display only */}
-        <div className="flex-1 max-w-[280px]">
+        {/* Static search pill — display only, opens search on click */}
+        <div className="flex-1 max-w-sm mx-6">
           <button
             aria-label="Search places"
-            className="flex w-full items-center gap-2 rounded-full border border-black/[0.12] bg-white px-3 py-1 shadow-sm cursor-pointer hover:border-black/[0.20] transition-colors"
+            className="flex w-full items-center gap-2 rounded-full border-[1.5px] border-black/[0.12] bg-white px-3 py-1 shadow-sm cursor-pointer hover:border-black/[0.20] transition-colors"
           >
             <span className="text-accent text-xs">✦</span>
             <span className="text-xs text-warm-gray-mid italic flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-              Explore a vibe / Any city · Any mood
+              Try &apos;dim cocktails...&apos;
             </span>
+            <span className="text-[10px] text-warm-gray-mid/60">⊞</span>
           </button>
         </div>
 
-        {/* Nav links + ♡ Saved pill */}
-        <div className="ml-auto flex items-center gap-5">
+        {/* Nav links — justify-between handles placement, no ml-auto needed */}
+        <div className="flex items-center gap-3">
           {links.map(({ href, label }) => {
             const isActive = pathname === href
             return (
@@ -43,23 +44,16 @@ export default function TopNav() {
                 key={href}
                 href={href}
                 className={cn(
-                  'text-sm font-medium transition-colors whitespace-nowrap',
-                  // Active state uses text-foreground (Airbnb-style) rather than text-accent
-                  isActive ? 'text-foreground font-semibold' : 'text-warm-gray-mid hover:text-foreground'
+                  'text-[13px] transition-colors whitespace-nowrap pb-[1px]',
+                  isActive
+                    ? 'font-semibold text-foreground border-b-[1.5px] border-foreground'
+                    : 'font-medium text-warm-gray-mid hover:text-foreground'
                 )}
               >
                 {label}
               </Link>
             )
           })}
-          {/* ♡ Saved pill button */}
-          <Link
-            href="/saved"
-            className="flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-medium text-foreground shadow-sm hover:border-foreground/20 transition-colors"
-          >
-            <Heart className="h-3.5 w-3.5" strokeWidth={1.6} />
-            Saved
-          </Link>
         </div>
       </div>
     </nav>

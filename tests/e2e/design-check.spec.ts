@@ -64,9 +64,10 @@ test('search returns results with interpretation strip', async ({ page }) => {
 
   await page.screenshot({ path: 'tests/screenshots/search-results.png' })
 
-  // Interpretation strip visible
-  const strip = page.locator('text=/Showing results|Matched|✦/i').first()
-  await expect(strip).toBeVisible()
+  // Interpretation strip visible — target the aria-live container to avoid
+  // matching the hidden TopNav sparkle pill (✦ is also in the TopNav pill button)
+  const strip = page.locator('[aria-live="polite"]').first()
+  await expect(strip).toBeVisible({ timeout: 8000 })
 
   // Results visible
   const results = page.locator('a[href*="/place/"]')

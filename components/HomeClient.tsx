@@ -9,6 +9,7 @@ import CategoryChips from '@/components/filters/CategoryChips'
 import FilterSheet from '@/components/filters/FilterSheet'
 import InterpretationStrip from '@/components/filters/InterpretationStrip'
 import PlaceCard from '@/components/places/PlaceCard'
+import { TASTE_TAGS, INTENT_TAGS, MOMENT_TAGS } from '@/lib/constants/tags'
 import SkeletonCard from '@/components/places/SkeletonCard'
 import CitySelector from '@/components/filters/CitySelector'
 import CityHero from '@/components/filters/CityHero'
@@ -168,6 +169,35 @@ export default function HomeClient() {
     setExtractedQuery(null)
   }
 
+  function toggleSidebarTag(tag: string, type: 'taste' | 'intent' | 'moment') {
+    const next = { ...activeFilters }
+    if (type === 'taste') {
+      next.tasteTags = next.tasteTags.includes(tag as TasteTag)
+        ? next.tasteTags.filter(t => t !== (tag as TasteTag))
+        : [...next.tasteTags, tag as TasteTag]
+    } else if (type === 'intent') {
+      next.intentTags = next.intentTags.includes(tag as IntentTag)
+        ? next.intentTags.filter(t => t !== (tag as IntentTag))
+        : [...next.intentTags, tag as IntentTag]
+    } else {
+      next.momentTags = next.momentTags.includes(tag as MomentTag)
+        ? next.momentTags.filter(t => t !== (tag as MomentTag))
+        : [...next.momentTags, tag as MomentTag]
+    }
+    handleTagChange(next)
+  }
+
+  const hasActiveTagFilters =
+    activeFilters.tasteTags.length > 0 ||
+    activeFilters.intentTags.length > 0 ||
+    activeFilters.momentTags.length > 0
+
+  const allActiveTags = [
+    ...activeFilters.tasteTags,
+    ...activeFilters.intentTags,
+    ...activeFilters.momentTags,
+  ]
+
   const selectedCity = cities.find((c) => c.id === cityId)
   const locationLabel = selectedCity ? `in ${selectedCity.name}` : 'worldwide'
 
@@ -260,21 +290,88 @@ export default function HomeClient() {
       <div className="flex flex-1">
 
         {/* Desktop sidebar (hidden mobile) */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 lg:flex-shrink-0 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5">
-          <VibeSearch
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSearch={runSearch}
-            onClear={clearSearch}
-            isSearching={isSearching}
-          />
-          <CitySelector cities={cities} selectedCityId={cityId} onSelect={handleCitySelect} />
-          {!isSearchMode ? (
-            <>
-              <CategoryChips activeTags={activeFilters} onChange={handleTagChange} wrap />
-              <FilterSheet activeTags={activeFilters} onChange={handleTagChange} inline />
-            </>
-          ) : (
+        <aside className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 lg:flex-shrink-0 lg:sticky lg:top-12 lg:h-[calc(100vh-3rem)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5">
+          {/* City */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">City</p>
+            <CitySelector cities={cities} selectedCityId={cityId} onSelect={handleCitySelect} />
+          </div>
+
+          {/* Vibe */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">Vibe</p>
+            <div className="flex flex-wrap gap-1.5">
+              {TASTE_TAGS.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => toggleSidebarTag(tag, 'taste')}
+                  className={cn(
+                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                    activeFilters.tasteTags.includes(tag as TasteTag)
+                      ? 'bg-accent border-accent text-white'
+                      : 'bg-white border-border text-warm-gray-mid hover:border-foreground/30'
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Intent */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">Intent</p>
+            <div className="flex flex-wrap gap-1.5">
+              {INTENT_TAGS.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => toggleSidebarTag(tag, 'intent')}
+                  className={cn(
+                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                    activeFilters.intentTags.includes(tag as IntentTag)
+                      ? 'bg-accent border-accent text-white'
+                      : 'bg-white border-border text-warm-gray-mid hover:border-foreground/30'
+                  )}
+                >
+                  {tag.replace(/-/g, ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Moment */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">Moment</p>
+            <div className="flex flex-wrap gap-1.5">
+              {MOMENT_TAGS.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => toggleSidebarTag(tag, 'moment')}
+                  className={cn(
+                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                    activeFilters.momentTags.includes(tag as MomentTag)
+                      ? 'bg-accent border-accent text-white'
+                      : 'bg-white border-border text-warm-gray-mid hover:border-foreground/30'
+                  )}
+                >
+                  {tag.replace(/-/g, ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Clear all */}
+          {hasActiveTagFilters && (
+            <button
+              onClick={() => handleTagChange({ ...activeFilters, tasteTags: [], intentTags: [], momentTags: [] })}
+              className="text-sm font-semibold text-accent text-left"
+            >
+              Clear all filters
+            </button>
+          )}
+
+          {/* Search interpretation strip (search mode only) */}
+          {isSearchMode && (
             <InterpretationStrip
               interpretedAs={interpretedAs}
               resultCount={searchResults?.length ?? 0}
@@ -288,16 +385,33 @@ export default function HomeClient() {
           {/* City editorial hero — scrolls away */}
           <CityHero city={selectedCity ?? null} />
 
-      {/* Result count */}
-      <div className="px-4 pb-1 pt-2">
-        <p className="text-xs text-warm-gray-mid" aria-live="polite" aria-atomic="true">
-          {isSearchMode
-            ? `${searchResults?.length ?? 0} ${(searchResults?.length ?? 0) === 1 ? 'result' : 'results'}`
-            : isLoading
-            ? <span className="animate-pulse">Loading…</span>
-            : `${allPlaces.length} ${allPlaces.length === 1 ? 'place' : 'places'} ${locationLabel}`
-          }
+      {/* Results header */}
+      <div className="flex items-center justify-between px-6 pb-2 pt-4" aria-live="polite" aria-atomic="true">
+        {/* Left: bold count + active tag names */}
+        <p className="text-sm text-foreground">
+          {isLoading && !isSearchMode ? (
+            <span className="animate-pulse text-warm-gray-mid">Loading…</span>
+          ) : isSearchMode ? (
+            <>
+              <span className="font-semibold">{searchResults?.length ?? 0} {(searchResults?.length ?? 0) === 1 ? 'result' : 'results'}</span>
+            </>
+          ) : (
+            <>
+              <span className="font-semibold">{allPlaces.length} {allPlaces.length === 1 ? 'place' : 'places'}</span>
+              {allActiveTags.map(tag => (
+                <span key={tag} className="text-warm-gray-mid"> · {tag.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+              ))}
+            </>
+          )}
         </p>
+
+        {/* Right: Sort pill (browse mode only) */}
+        {!isSearchMode && !isLoading && (
+          <div className="flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1 text-xs font-medium text-foreground shadow-sm">
+            Sort: Featured first
+            <span className="text-warm-gray-mid text-[10px]">▾</span>
+          </div>
+        )}
       </div>
 
       {/* Content */}

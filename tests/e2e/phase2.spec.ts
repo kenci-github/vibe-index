@@ -216,17 +216,19 @@ test('Navigating to /?taste=cozy pre-selects the cozy tag', async ({ page }) => 
   // The "cozy" tag button should be in active state.
   // Active state classes: border-accent bg-accent text-white
   // aria-pressed="true" is the most reliable selector.
-  // Note: desktop layout renders CategoryChips + sidebar TagFilter + sheet TagFilter,
-  // so multiple matching buttons exist. Use .first() to avoid strict-mode violation.
+  // Note: emoji chip buttons contain an icon + label (e.g. "🌿\nCozy"), so avoid
+  // anchored regex — use a substring match instead to handle emoji prefix.
   const cozyButton = page
     .locator('button[aria-pressed="true"]')
-    .filter({ hasText: /^cozy$/i })
+    .filter({ hasText: /cozy/i })
     .first()
 
   await expect(cozyButton).toBeVisible({ timeout: 10_000 })
 
-  // The active button must carry the accent background class.
-  await expect(cozyButton).toHaveClass(/bg-accent/, { timeout: 5_000 })
+  // The active button carries border-foreground in the mobile emoji-chip row
+  // (bg-accent only applies in the sidebar wrap=true variant).
+  // Asserting the visible active chip circle has the foreground background.
+  await expect(cozyButton).toHaveClass(/border-foreground/, { timeout: 5_000 })
 
   // At least 1 place card must be visible, or the empty state must show.
   const cardCount = await countPlaceCards(page)

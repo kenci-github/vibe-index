@@ -151,6 +151,7 @@ Session 5: [x] Phase 2 complete — BookingCTA, pagination, URL params, skeleton
 Session 5: [x] Phase 2b — PostHog wired up
 Session 6: [x] Phase 5 complete — featured sort, city hero, related places, waitlist
 Session 7: [x] UI/UX redesign — Cormorant Garamond + DM Sans, #C4622D accent, warm palette, editorial mixed grid, redesigned search/chips/cards/tags across all screens
+Session 8: [x] Desktop layout fix — TopNav justify-between (nav links always right-aligned), sidebar replaced with labelled VIBE/INTENT/MOMENT wrapping pill sections, results header redesigned (bold count + tag breadcrumbs + Sort pill), e2e test selector fixes (28 pass, 1 skip)
 
 ## Design System (Redesigned — Session 7)
 Accent: #C4622D — burnt terracotta

@@ -8,7 +8,7 @@ async function getAllPlaces() {
   const all = []
   let offset = 0
   while (true) {
-    const batch = await getPlaces({ cityId: null, tasteTags: [], intentTags: [], momentTags: [] }, offset, PAGE_SIZE)
+    const batch = await getPlaces({ cityId: null, category: 'all', tasteTags: [], intentTags: [], momentTags: [] }, offset, PAGE_SIZE)
     all.push(...batch)
     if (batch.length < PAGE_SIZE) break
     offset += PAGE_SIZE

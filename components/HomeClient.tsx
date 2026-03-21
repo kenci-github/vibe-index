@@ -59,6 +59,7 @@ export default function HomeClient() {
 
   const activeFilters = useMemo<ActiveFilters>(() => ({
     cityId,
+    category: 'all',
     tasteTags: tasteStr.split(',').filter(Boolean) as TasteTag[],
     intentTags: intentStr.split(',').filter(Boolean) as IntentTag[],
     momentTags: momentStr.split(',').filter(Boolean) as MomentTag[],
@@ -75,6 +76,7 @@ export default function HomeClient() {
     let cancelled = false
     const initialFilters: ActiveFilters = {
       cityId: initialCityId,
+      category: 'all',
       tasteTags: tasteStr.split(',').filter(Boolean) as TasteTag[],
       intentTags: intentStr.split(',').filter(Boolean) as IntentTag[],
       momentTags: momentStr.split(',').filter(Boolean) as MomentTag[],
@@ -266,7 +268,7 @@ export default function HomeClient() {
                     </button>
                   ))}
                   <button
-                    onClick={() => handleTagChange({ ...activeFilters, tasteTags: [], intentTags: [], momentTags: [] })}
+                    onClick={() => handleTagChange({ ...activeFilters, category: 'all', tasteTags: [], intentTags: [], momentTags: [] })}
                     className="shrink-0 text-xs font-medium text-warm-gray-mid hover:text-foreground transition whitespace-nowrap"
                   >
                     Clear all
@@ -363,7 +365,7 @@ export default function HomeClient() {
           {/* Clear all */}
           {hasActiveTagFilters && (
             <button
-              onClick={() => handleTagChange({ ...activeFilters, tasteTags: [], intentTags: [], momentTags: [] })}
+              onClick={() => handleTagChange({ ...activeFilters, category: 'all', tasteTags: [], intentTags: [], momentTags: [] })}
               className="text-sm font-semibold text-accent text-left"
             >
               Clear all filters
@@ -460,7 +462,7 @@ export default function HomeClient() {
                 <p className="text-sm text-warm-gray-mid">No places match your current selection</p>
               </div>
               <button
-                onClick={() => handleTagChange({ cityId, tasteTags: [], intentTags: [], momentTags: [] })}
+                onClick={() => handleTagChange({ cityId, category: 'all', tasteTags: [], intentTags: [], momentTags: [] })}
                 className="mt-1 rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white transition active:scale-95"
               >
                 Clear filters

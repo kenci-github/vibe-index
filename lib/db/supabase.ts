@@ -16,6 +16,7 @@ export async function getPlaces(filters: ActiveFilters, offset: number = 0, limi
     .eq('active', true)
 
   if (filters.cityId) query = query.eq('city_id', filters.cityId)
+  if (filters.category && filters.category !== 'all') query = query.eq('category', filters.category)
   if (filters.tasteTags.length) query = query.contains('taste_tags', filters.tasteTags)
   if (filters.intentTags.length) query = query.contains('intent_tags', filters.intentTags)
   if (filters.momentTags.length) query = query.contains('moment_tags', filters.momentTags)

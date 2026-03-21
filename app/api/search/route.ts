@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
     parsed.taste_tags.length > 0 ||
     parsed.intent_tags.length > 0 ||
     parsed.moment_tags.length > 0 ||
-    parsed.is_quiet
+    parsed.is_quiet ||
+    parsed.category !== null
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let q: any = supabase
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
     .eq('active', true)
 
   if (city_id) q = q.eq('city_id', city_id)
+  if (parsed.category) q = q.eq('category', parsed.category)
 
   if (hasFilters) {
     // overlaps = match ANY tag (OR logic) — more forgiving for natural language
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
         taste_tags:       parsed.taste_tags,
         intent_tags:      parsed.intent_tags,
         moment_tags:      parsed.moment_tags,
+        category:         parsed.category,
         matched_keywords: parsed.matched_keywords,
         is_quiet:         parsed.is_quiet,
       },

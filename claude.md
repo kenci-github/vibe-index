@@ -152,6 +152,7 @@ Session 5: [x] Phase 2b — PostHog wired up
 Session 6: [x] Phase 5 complete — featured sort, city hero, related places, waitlist
 Session 7: [x] UI/UX redesign — Cormorant Garamond + DM Sans, #C4622D accent, warm palette, editorial mixed grid, redesigned search/chips/cards/tags across all screens
 Session 8: [x] Desktop layout fix — TopNav justify-between (nav links always right-aligned), sidebar replaced with labelled VIBE/INTENT/MOMENT wrapping pill sections, results header redesigned (bold count + tag breadcrumbs + Sort pill), e2e test selector fixes (28 pass, 1 skip)
+Session 9: [x] Phase 6.1+6.2 — category layer: PlaceCategory/CategoryFilter types, girls-night/solo-reset IntentTags, lib/constants/categories.ts, category on Place + ActiveFilters, getPlaces() category filter, search API category filtering, ParsedQuery.category, KEYWORD_MAP category mappings, DB migrations (intent tags + category column + view refresh + seeded places)
 
 ## Design System (Redesigned — Session 7)
 Accent: #C4622D — burnt terracotta
@@ -166,3 +167,10 @@ Interpretation strip: bg-accent/[0.06] with left border-accent, ✦ prefix, resu
 
 ## Documentation
 Update files in docs folder after major milestones and updates to the project.
+
+## Development Workflow section
+- After making UI changes, always restart the Next.js dev server and clear the cache (`rm -rf .next && npm run dev`) before verifying changes visually or with Playwright.
+## Project Overview
+- This is a TypeScript project. Always maintain type safety and use TypeScript idioms when editing or creating files.
+## UI/Design Work section
+- When the user shares a design screenshot for comparison, ask clarifying questions about specific elements BEFORE making changes. List what you observe and confirm priorities.

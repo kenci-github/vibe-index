@@ -36,6 +36,24 @@ export type IntentTag =
   | 'manicure'
   | 'dessert'
   | 'late-night'
+  | 'girls-night'
+  | 'solo-reset'
+
+export type PlaceCategory =
+  | 'food'
+  | 'drink'
+  | 'cafe'
+  | 'spa'
+  | 'wellness'
+  | 'hair'
+  | 'nails'
+  | 'dental'
+  | 'fitness'
+  | 'nightlife'
+  | 'shopping'
+  | 'experience'
+
+export type CategoryFilter = PlaceCategory | 'all'
 
 export type MomentTag =
   | 'before-dinner'
@@ -60,6 +78,7 @@ export type Place = {
   taste_tags: TasteTag[]
   intent_tags: IntentTag[]
   moment_tags: MomentTag[]
+  category: PlaceCategory | null
   tiktok_url: string | null
   google_maps_url: string | null
   booking_url: string | null
@@ -74,4 +93,5 @@ export type ActiveFilters = {
   tasteTags: TasteTag[]
   intentTags: IntentTag[]
   momentTags: MomentTag[]
+  category: CategoryFilter
 }

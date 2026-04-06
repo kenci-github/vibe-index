@@ -15,8 +15,9 @@ import CitySelector from '@/components/filters/CitySelector'
 import CityHero from '@/components/filters/CityHero'
 import { getPlaces } from '@/lib/db/supabase'
 import { CITY_STORAGE_KEY } from '@/lib/storage/bookmarks'
+import { logEvent } from '@/lib/analytics/events'
 import { cn } from '@/lib/utils'
-import type { Place, ActiveFilters, City, Country, TasteTag, IntentTag, MomentTag } from '@/types'
+import type { Place, ActiveFilters, City, Country, TasteTag, IntentTag, MomentTag, CategoryFilter } from '@/types'
 import type { ParsedQuery } from '@/lib/search/keywords'
 
 function getMatchedTags(place: Place, extracted: ParsedQuery | null): string[] {
@@ -56,14 +57,15 @@ export default function HomeClient() {
   const tasteStr = searchParams.get('taste') ?? ''
   const intentStr = searchParams.get('intent') ?? ''
   const momentStr = searchParams.get('moment') ?? ''
+  const categoryParam = (searchParams.get('category') ?? 'all') as CategoryFilter
 
   const activeFilters = useMemo<ActiveFilters>(() => ({
     cityId,
-    category: 'all',
+    category: categoryParam,
     tasteTags: tasteStr.split(',').filter(Boolean) as TasteTag[],
     intentTags: intentStr.split(',').filter(Boolean) as IntentTag[],
     momentTags: momentStr.split(',').filter(Boolean) as MomentTag[],
-  }), [cityId, tasteStr, intentStr, momentStr])
+  }), [cityId, categoryParam, tasteStr, intentStr, momentStr])
 
   // Mount: parallel cities + places fetches
   useEffect(() => {
@@ -76,7 +78,7 @@ export default function HomeClient() {
     let cancelled = false
     const initialFilters: ActiveFilters = {
       cityId: initialCityId,
-      category: 'all',
+      category: categoryParam,
       tasteTags: tasteStr.split(',').filter(Boolean) as TasteTag[],
       intentTags: intentStr.split(',').filter(Boolean) as IntentTag[],
       momentTags: momentStr.split(',').filter(Boolean) as MomentTag[],
@@ -108,7 +110,7 @@ export default function HomeClient() {
       }
     })
     return () => { cancelled = true }
-  }, [cityId, tasteStr, intentStr, momentStr]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cityId, categoryParam, tasteStr, intentStr, momentStr]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadMore() {
     setLoadingMore(true)
@@ -145,6 +147,7 @@ export default function HomeClient() {
   async function runSearch(query: string) {
     if (!query.trim() || query.trim().length < 2) return
     setIsSearching(true)
+    logEvent({ event_type: 'search_submitted', search_query: query.trim(), city_id: cityId ?? undefined })
     try {
       const res = await fetch('/api/search', {
         method: 'POST',
@@ -293,6 +296,15 @@ export default function HomeClient() {
 
         {/* Desktop sidebar (hidden mobile) */}
         <aside className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 lg:flex-shrink-0 lg:sticky lg:top-12 lg:h-[calc(100vh-3rem)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5">
+          {/* Search */}
+          <VibeSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSearch={runSearch}
+            onClear={clearSearch}
+            isSearching={isSearching}
+          />
+
           {/* City */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">City</p>
@@ -482,15 +494,35 @@ export default function HomeClient() {
                         </div>
                       )
                     })
-                  : allPlaces.map((place, i) => {
+                  : allPlaces.flatMap((place, i) => {
                       const isHero = i === 0
                       const isWide = i > 0 && (i - 1) % 5 === 4
                       const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
-                      return (
+                      const card = (
                         <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
                           <PlaceCard place={place} variant={variant} />
                         </div>
                       )
+                      if (i === 9) {
+                        return [card, (
+                          <div key="submit-cta" className="col-span-2 lg:col-span-3 xl:col-span-4">
+                            <div className="flex flex-col items-center gap-4 rounded-2xl border border-accent/20 bg-accent/[0.06] px-6 py-8 text-center">
+                              <p className="text-2xl text-accent">✦</p>
+                              <div className="space-y-1">
+                                <p className="font-display text-xl font-semibold text-foreground">Know a place with the right vibe?</p>
+                                <p className="text-sm text-warm-gray-mid">Submit it to the Vibe Index.</p>
+                              </div>
+                              <Link
+                                href="/submit"
+                                className="rounded-full border border-accent px-6 py-2 text-sm font-semibold text-accent transition hover:bg-accent hover:text-white active:scale-95"
+                              >
+                                Submit a place
+                              </Link>
+                            </div>
+                          </div>
+                        )]
+                      }
+                      return [card]
                     })}
               </div>
 

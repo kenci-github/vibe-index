@@ -21,19 +21,7 @@ export default function TopNav() {
           Vibe Index
         </span>
 
-        {/* Static search pill — display only, opens search on click */}
-        <div className="flex-1 max-w-sm mx-6">
-          <button
-            aria-label="Search places"
-            className="flex w-full items-center gap-2 rounded-full border-[1.5px] border-black/[0.12] bg-white px-3 py-1 shadow-sm cursor-pointer hover:border-black/[0.20] transition-colors"
-          >
-            <span className="text-accent text-xs">✦</span>
-            <span className="text-xs text-warm-gray-mid italic flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-              Try &apos;dim cocktails...&apos;
-            </span>
-            <span className="text-[10px] text-warm-gray-mid/60">⊞</span>
-          </button>
-        </div>
+        <div className="flex-1" />
 
         {/* Nav links — justify-between handles placement, no ml-auto needed */}
         <div className="flex items-center gap-3">

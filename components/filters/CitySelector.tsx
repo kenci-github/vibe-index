@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FLAG_MAP } from '@/lib/constants/flags'
+import { logEvent } from '@/lib/analytics/events'
 import type { City, Country } from '@/types'
 
 interface CitySelectorProps {
@@ -17,9 +18,11 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [isMobile, setIsMobile] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    setMounted(true)
     const check = () => setIsMobile(window.innerWidth < 768)
     check()
     window.addEventListener('resize', check)
@@ -65,6 +68,7 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   function handleSelect(cityId: string | null) {
     // TODO: if city.active === false, show WaitlistForm instead of selecting
     // Currently unreachable via normal UI — getCities() returns active cities only
+    logEvent({ event_type: 'city_selected', city_id: cityId ?? undefined })
     onSelect(cityId)
     closeSheet()
   }
@@ -207,7 +211,7 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
       </button>
 
       {/* Portal backdrop + sheet to body to escape sticky header backdrop-filter stacking context */}
-      {typeof document !== 'undefined' && createPortal(sheet, document.body)}
+      {mounted && createPortal(sheet, document.body)}
     </>
   )
 }

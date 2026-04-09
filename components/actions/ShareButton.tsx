@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { Share2, Check } from 'lucide-react'
+import { logEvent } from '@/lib/analytics/events'
 
 export default function ShareButton() {
   const [copied, setCopied] = useState(false)
 
   async function handleShare() {
     const url = window.location.href
+    logEvent({ event_type: 'share_tapped', metadata: { url } })
 
     if (navigator.share) {
       try {

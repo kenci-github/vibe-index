@@ -64,6 +64,8 @@ export type MomentTag =
 
 export type TagType = 'taste' | 'intent' | 'moment'
 
+export type CreatorPlatform = 'tiktok' | 'instagram' | 'youtube'
+
 export type Place = {
   id: string
   name: string
@@ -86,6 +88,8 @@ export type Place = {
   featured: boolean
   active: boolean
   created_at: string
+  creator_handle: string | null
+  creator_platform: CreatorPlatform | null
 }
 
 export type ActiveFilters = {
@@ -94,4 +98,18 @@ export type ActiveFilters = {
   intentTags: IntentTag[]
   momentTags: MomentTag[]
   category: CategoryFilter
+}
+
+export type SubmissionStatus = 'pending' | 'approved' | 'rejected'
+
+export type PlaceSubmission = {
+  id: string
+  place_name: string
+  city_id: string | null
+  vibe_description: string | null
+  booking_url: string | null
+  social_url: string | null
+  submitter_email: string
+  status: SubmissionStatus
+  created_at: string
 }

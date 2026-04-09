@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { isBookmarked, toggleBookmark } from '@/lib/storage/bookmarks'
+import { logEvent } from '@/lib/analytics/events'
 
 interface BookmarkButtonProps {
   id: string
@@ -22,6 +23,7 @@ export default function BookmarkButton({ id, className }: BookmarkButtonProps) {
     e.stopPropagation()
     const next = toggleBookmark(id)
     setSaved(next)
+    logEvent({ event_type: 'bookmark_tapped', place_id: id, metadata: { saved: next } })
   }
 
   return (

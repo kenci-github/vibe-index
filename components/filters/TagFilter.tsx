@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { TAG_GROUPS } from '@/lib/constants/tags'
+import { logEvent } from '@/lib/analytics/events'
 import type { ActiveFilters, TasteTag, IntentTag, MomentTag } from '@/types'
 import HScrollRow from '@/components/ui/HScrollRow'
 
@@ -38,18 +39,21 @@ export default function TagFilter({ activeTags, onChange }: TagFilterProps) {
       const next = activeTags.tasteTags.includes(t)
         ? activeTags.tasteTags.filter((x) => x !== t)
         : [...activeTags.tasteTags, t]
+      logEvent({ event_type: 'tag_applied', taste_tags: next })
       onChange({ ...activeTags, tasteTags: next })
     } else if (group === 'Intent') {
       const t = tag as IntentTag
       const next = activeTags.intentTags.includes(t)
         ? activeTags.intentTags.filter((x) => x !== t)
         : [...activeTags.intentTags, t]
+      logEvent({ event_type: 'tag_applied', intent_tags: next })
       onChange({ ...activeTags, intentTags: next })
     } else {
       const t = tag as MomentTag
       const next = activeTags.momentTags.includes(t)
         ? activeTags.momentTags.filter((x) => x !== t)
         : [...activeTags.momentTags, t]
+      logEvent({ event_type: 'tag_applied', moment_tags: next })
       onChange({ ...activeTags, momentTags: next })
     }
   }

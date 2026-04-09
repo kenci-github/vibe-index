@@ -105,15 +105,15 @@ test('related places section appears on place detail page', async ({ page }) => 
 })
 
 // ─── TEST 4: Submit page ──────────────────────────────────────────────────────
-// NOTE: /submit page is a P1 feature not yet built — this test is skipped until
-// the page and navigation link exist.
-test.skip('submit a place link exists in navigation', async ({ page }) => {
+test('submit a place link exists in navigation', async ({ page }) => {
   await page.goto('/')
   await waitForFeedLoaded(page)
 
-  // Look for a link to /submit anywhere on the page (nav, button, fab)
-  const submitLink = page.locator('a[href="/submit"]')
-  await expect(submitLink).toBeVisible()
+  // On mobile: TopNav is hidden (lg:block), so the visible submit link is the
+  // feed CTA card injected after the 10th place card. Scroll it into view first.
+  const submitLink = page.locator('a[href="/submit"]').last()
+  await submitLink.scrollIntoViewIfNeeded()
+  await expect(submitLink).toBeVisible({ timeout: 8_000 })
 })
 
 // ─── TEST 5: Full user journey smoke test ─────────────────────────────────────

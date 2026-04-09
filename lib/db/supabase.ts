@@ -87,6 +87,33 @@ export async function getWaitlistCount(cityId: string): Promise<number> {
   return count ?? 0
 }
 
+export async function getTasteAffinityPlaces(
+  sourcePlaceId: string,
+  limit = 6
+): Promise<Place[]> {
+  // 1. Get scored place IDs from RPC
+  const { data: scored, error: rpcError } = await supabase.rpc('get_taste_affinity', {
+    source_place_id: sourcePlaceId,
+    result_limit: limit,
+  })
+  if (rpcError || !scored || scored.length === 0) return []
+
+  const ids = scored.map((r: { id: string }) => r.id)
+
+  // 2. Fetch full place rows
+  const { data, error } = await supabase
+    .from('places_with_location')
+    .select('*')
+    .in('id', ids)
+    .eq('active', true)
+
+  if (error || !data) return []
+
+  // Preserve score ordering from RPC
+  const idOrder = new Map<string, number>(ids.map((id: string, i: number) => [id, i]))
+  return (data as Place[]).sort((a, b) => (idOrder.get(a.id) ?? 0) - (idOrder.get(b.id) ?? 0))
+}
+
 export async function getSavedPlaces(ids: string[]): Promise<Place[]> {
   if (!ids.length) return []
   const { data, error } = await supabase

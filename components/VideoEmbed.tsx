@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
+import { logEvent } from '@/lib/analytics/events'
 
 interface VideoEmbedProps {
   url: string
@@ -15,6 +16,7 @@ export default function VideoEmbed({ url, thumbnail }: VideoEmbedProps) {
 
   async function handlePlay() {
     setState('loading')
+    logEvent({ event_type: 'video_played', metadata: { url } })
     try {
       const res = await fetch(`/api/oembed?url=${encodeURIComponent(url)}`)
       if (!res.ok) throw new Error('oEmbed failed')

@@ -22,6 +22,8 @@ export const INTENT_TAGS = [
   'manicure',
   'dessert',
   'late-night',
+  'girls-night',
+  'solo-reset',
 ] as const
 
 export const MOMENT_TAGS = [

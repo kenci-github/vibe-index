@@ -1,13 +1,16 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin } from 'lucide-react'
-import { getPlaceById, getRelatedPlaces } from '@/lib/db/supabase'
+import { getPlaceById, getRelatedPlaces, getTasteAffinityPlaces } from '@/lib/db/supabase'
 import BookmarkButton from '@/components/actions/BookmarkButton'
 import ShareButton from '@/components/actions/ShareButton'
 import PlaceImage from '@/components/places/PlaceImage'
 import VideoEmbed from '@/components/VideoEmbed'
 import PlaceCard from '@/components/places/PlaceCard'
 import BookingCTA from '@/components/places/BookingCTA'
+import CreatorAttribution from '@/components/places/CreatorAttribution'
+import PlaceViewTracker from '@/components/places/PlaceViewTracker'
+import { CATEGORIES } from '@/lib/constants/categories'
 import type { Metadata } from 'next'
 
 interface PlacePageProps {
@@ -47,7 +50,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const { id } = await params
   const place = await getPlaceById(id)
   if (!place) notFound()
-  const related = await getRelatedPlaces(place)
+  const [related, affinity] = await Promise.all([
+    getRelatedPlaces(place),
+    getTasteAffinityPlaces(place.id),
+  ])
 
   const locationParts = [place.neighbourhood, place.city_name, place.country_name].filter(Boolean)
   const locationString = locationParts.join(' · ')
@@ -60,6 +66,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <PlaceViewTracker placeId={place.id} cityId={place.city_id} category={place.category} />
       {/* Back button — desktop (outside grid, above) */}
       <div className="hidden lg:flex items-center gap-3 mx-auto max-w-5xl px-8 pt-6 pb-4">
         <Link
@@ -139,6 +146,26 @@ export default async function PlacePage({ params }: PlacePageProps) {
             </div>
           </div>
 
+          {/* Category pill */}
+          {place.category && (() => {
+            const cat = CATEGORIES.find(c => c.value === place.category)
+            return cat ? (
+              <p className="mb-4 text-sm text-warm-gray-mid">{cat.emoji} {cat.label}</p>
+            ) : null
+          })()}
+
+          {/* Creator attribution */}
+          {place.creator_handle && place.creator_platform && (
+            <div className="mb-4">
+              <CreatorAttribution
+                handle={place.creator_handle}
+                platform={place.creator_platform}
+                videoUrl={place.tiktok_url}
+                variant="detail"
+              />
+            </div>
+          )}
+
           {/* Description */}
           {place.description && (
             <p className="text-base leading-relaxed text-foreground">{place.description}</p>
@@ -187,10 +214,48 @@ export default async function PlacePage({ params }: PlacePageProps) {
             </div>
           )}
 
+          {/* See more in category */}
+          {place.category && (() => {
+            const cat = CATEGORIES.find(c => c.value === place.category)
+            if (!cat) return null
+            const href = `/?category=${place.category}`
+            return (
+              <Link
+                href={href}
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline"
+              >
+                {cat.emoji} See more {cat.label} places →
+              </Link>
+            )
+          })()}
+
           {/* Video embed */}
           {place.tiktok_url && (
             <div className="mt-5">
               <VideoEmbed url={place.tiktok_url} thumbnail={place.thumbnail_url} />
+            </div>
+          )}
+
+          {/* Others also loved — affinity-based, cold-start safe */}
+          {affinity.length > 0 && (
+            <div className="mt-10">
+              <div className="mb-4">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid">
+                  Others also loved
+                </p>
+                <p className="font-display text-xl font-bold leading-tight text-foreground">
+                  based on your vibe
+                </p>
+              </div>
+              <div className="-mx-4 lg:mx-0 overflow-x-auto scroll-smooth [scroll-snap-type:x_mandatory] [&::-webkit-scrollbar]:hidden">
+                <div className="flex gap-3 px-4 lg:px-0 pb-3">
+                  {affinity.map((r) => (
+                    <div key={r.id} className="w-40 flex-shrink-0 [scroll-snap-align:start]">
+                      <PlaceCard place={r} variant="default" />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 

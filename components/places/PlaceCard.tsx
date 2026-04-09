@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import BookmarkButton from '@/components/actions/BookmarkButton'
 import PlaceImage from '@/components/places/PlaceImage'
+import CreatorAttribution from '@/components/places/CreatorAttribution'
 import { FLAG_MAP } from '@/lib/constants/flags'
+import { CATEGORIES } from '@/lib/constants/categories'
 import type { Place } from '@/types'
 
 interface PlaceCardProps {
@@ -61,10 +63,19 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
         <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/20 to-transparent ${namePadding}`}>
           <p className={`font-display ${nameSize} leading-tight text-white`}>{place.name}</p>
           {/* Location — shown in overlay for all variants */}
-          <p className="text-[11px] text-white/72 mb-1.5">📍 {locationLine}</p>
+          <p className="text-[11px] text-white/72 mb-1">📍 {locationLine}</p>
+          {/* Creator attribution */}
+          {place.creator_handle && place.creator_platform && (
+            <CreatorAttribution
+              handle={place.creator_handle}
+              platform={place.creator_platform}
+              videoUrl={place.tiktok_url}
+              variant="card"
+            />
+          )}
           {/* Tags — moved inside overlay */}
           {!searchMode && tasteTags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1 mt-1.5">
               {tasteTags.map((tag) => (
                 <span
                   key={tag}
@@ -84,6 +95,14 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
           <p className="truncate text-xs text-warm-gray-mid">{locationLine}</p>
         </div>
       )}
+
+      {/* Category label */}
+      {variant !== 'hero' && place.category && (() => {
+        const cat = CATEGORIES.find(c => c.value === place.category)
+        return cat ? (
+          <p className="mt-0.5 px-0.5 text-xs text-warm-gray-mid">{cat.emoji} {cat.label}</p>
+        ) : null
+      })()}
 
       {/* Search matched line */}
       {searchMode && matchedTags.length > 0 && (

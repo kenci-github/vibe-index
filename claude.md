@@ -153,6 +153,7 @@ Session 6: [x] Phase 5 complete — featured sort, city hero, related places, wa
 Session 7: [x] UI/UX redesign — Cormorant Garamond + DM Sans, #C4622D accent, warm palette, editorial mixed grid, redesigned search/chips/cards/tags across all screens
 Session 8: [x] Desktop layout fix — TopNav justify-between (nav links always right-aligned), sidebar replaced with labelled VIBE/INTENT/MOMENT wrapping pill sections, results header redesigned (bold count + tag breadcrumbs + Sort pill), e2e test selector fixes (28 pass, 1 skip)
 Session 9: [x] Phase 6.1+6.2 — category layer: PlaceCategory/CategoryFilter types, girls-night/solo-reset IntentTags, lib/constants/categories.ts, category on Place + ActiveFilters, getPlaces() category filter, search API category filtering, ParsedQuery.category, KEYWORD_MAP category mappings, DB migrations (intent tags + category column + view refresh + seeded places)
+Session 10: [x] /submit page — place_submissions table + RLS, /api/submit route (honeypot + full server-side validation + service role key), SubmitForm client component (CitySelector, inline errors, loading state), submit page converted to server component, inline editorial CTA card injected after 10th place card in home feed
 
 ## Design System (Redesigned — Session 7)
 Accent: #C4622D — burnt terracotta

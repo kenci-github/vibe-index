@@ -1,6 +1,7 @@
 'use client'
 
 import { MessageCircle, CalendarCheck, Scissors, ExternalLink, Phone, Instagram } from 'lucide-react'
+import { logEvent } from '@/lib/analytics/events'
 
 interface BookingCTAProps {
   bookingUrl: string | null
@@ -57,6 +58,7 @@ export default function BookingCTA({ bookingUrl, ctaType, placeName }: BookingCT
     <a
       href={config.href}
       {...(config.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      onClick={() => logEvent({ event_type: 'booking_cta_tapped', cta_type: ctaType })}
       className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-4 text-[15px] font-semibold tracking-tight text-white transition active:scale-95"
     >
       {config.icon}

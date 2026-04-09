@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { logEvent } from '@/lib/analytics/events'
 import type { ActiveFilters, TasteTag, IntentTag, MomentTag } from '@/types'
 
 interface ChipDef {
@@ -90,6 +91,18 @@ function toggleChip(chip: ChipDef, activeTags: ActiveFilters): ActiveFilters {
   }
 }
 
+function handleChipChange(chip: ChipDef, activeTags: ActiveFilters, onChange: (f: ActiveFilters) => void) {
+  const next = toggleChip(chip, activeTags)
+  logEvent({
+    event_type: 'tag_applied',
+    taste_tags: next.tasteTags,
+    intent_tags: next.intentTags,
+    moment_tags: next.momentTags,
+    metadata: { chip: chip.label },
+  })
+  onChange(next)
+}
+
 export default function CategoryChips({ activeTags, onChange, wrap = false }: CategoryChipsProps) {
   const chips = CHIPS.map((chip) => ({
     ...chip,
@@ -131,7 +144,7 @@ export default function CategoryChips({ activeTags, onChange, wrap = false }: Ca
   const iconChipElements = chips.map(({ label, active, ...chip }) => (
     <button
       key={label}
-      onClick={() => onChange(toggleChip({ label, ...chip }, activeTags))}
+      onClick={() => handleChipChange({ label, ...chip }, activeTags, onChange)}
       aria-pressed={active}
       className={cn(
         'flex flex-col items-center gap-1.5 px-2 pb-2 pt-1.5 flex-shrink-0 min-w-[52px] border-b-2 transition-all',
@@ -162,7 +175,7 @@ export default function CategoryChips({ activeTags, onChange, wrap = false }: Ca
         {chips.map(({ label, active, ...chip }) => (
           <button
             key={label}
-            onClick={() => onChange(toggleChip({ label, ...chip }, activeTags))}
+            onClick={() => handleChipChange({ label, ...chip }, activeTags, onChange)}
             aria-pressed={active}
             className={cn(
               'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95',

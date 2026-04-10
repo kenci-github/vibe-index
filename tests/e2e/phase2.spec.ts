@@ -109,14 +109,16 @@ test('BookingCTA renders on place detail page', async ({ page }) => {
     return
   }
 
-  // If a booking link is present, verify it opens in a new tab.
-  const target = await bookingLink.first().getAttribute('target')
-  expect(target).toBe('_blank')
-
-  // And must have a real href (not empty).
+  // If a booking link is present, verify it has a real href.
   const bookingHref = await bookingLink.first().getAttribute('href')
   expect(bookingHref).toBeTruthy()
   expect(bookingHref!.length).toBeGreaterThan(5)
+
+  // External links (non-tel:) must open in a new tab.
+  if (!bookingHref!.startsWith('tel:')) {
+    const target = await bookingLink.first().getAttribute('target')
+    expect(target).toBe('_blank')
+  }
 })
 
 // ---------------------------------------------------------------------------

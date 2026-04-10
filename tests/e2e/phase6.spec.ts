@@ -152,8 +152,8 @@ test('natural language search returns results and shows interpretation strip', a
   await searchInput.fill('cozy date night drinks')
   await searchInput.press('Enter')
 
-  // Loading state appears
-  await expect(page.getByText(/finding your vibe/i)).toBeVisible({ timeout: 5_000 })
+  // Loading state appears — use .first() because sidebar aside renders a second copy in the DOM
+  await expect(page.getByText(/finding your vibe/i).first()).toBeVisible({ timeout: 5_000 })
 
   // Wait for results
   await waitForFeedLoaded(page)

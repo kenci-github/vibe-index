@@ -4,22 +4,42 @@
 
 @layer base {
   :root {
-    --background: 38 25% 97%;
-    --foreground: 28 18% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 28 18% 10%;
-    --surface: 0 0% 100%;
-    --primary: 28 18% 10%;
-    --primary-foreground: 38 25% 97%;
-    --secondary: 35 20% 93%;
-    --secondary-foreground: 28 18% 10%;
-    --muted: 35 20% 93%;
-    --muted-foreground: 25 12% 45%;
-    --border: 35 15% 88%;
-    --input: 35 15% 88%;
-    --ring: 28 18% 10%;
+    /* === Color Tokens === */
+    --accent:        oklch(0.58 0.14 32);
+    --accent-light:  oklch(0.95 0.04 32);
+    --accent-mid:    oklch(0.72 0.11 32);
+    --border:        oklch(0.91 0.008 55);
+    --muted:         oklch(0.52 0.01 55);
+    --dim:           oklch(0.72 0.008 55);
+    --surface:       oklch(0.975 0.007 55);
+    --bg:            oklch(0.985 0.006 55);
+    --card:          #ffffff;
+    --text:          oklch(0.18 0.01 50);
+
+    /* === Accent Variants (swap to change theme) === */
+    /* Coral (default): --accent: oklch(0.58 0.14 32); */
+    /* Sage:            --accent: oklch(0.50 0.10 155); --accent-light: oklch(0.95 0.03 155); --accent-mid: oklch(0.72 0.07 155); */
+    /* Indigo:          --accent: oklch(0.50 0.16 270); --accent-light: oklch(0.95 0.04 270); --accent-mid: oklch(0.72 0.11 270); */
+
+    /* === Spacing & Layout === */
+    --radius-card:      14px;
+    --page-px:          28px;
+    --page-px-mobile:   16px;
+    --sidebar-w:        252px;
+    --sidebar-w-tablet: 220px;
+    --header-h:         68px;
+    --header-h-mobile:  58px;
+
+    /* === Shadows === */
+    --shadow-card:      0 1px 5px oklch(0.1 0.02 50 / 0.06);
+    --shadow-card-hover:0 8px 30px oklch(0.1 0.02 50 / 0.13);
+    --shadow-dropdown:  0 8px 28px oklch(0 0 0 / 0.12);
+    --shadow-sheet:     0 -4px 40px oklch(0 0 0 / 0.15);
+
+    /* === Legacy aliases (keep for existing components during migration) === */
+    --background: var(--bg);
+    --foreground: var(--text);
     --radius: 0.5rem;
-    --accent: #C4622D;
   }
 
   * {
@@ -78,4 +98,25 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
   }
+}
+
+@keyframes springBounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+
+.filter-sheet-content[data-state="open"] {
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.filter-sheet-content[data-state="closed"] {
+  animation: slideDown 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
 }

@@ -7,8 +7,11 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import VibeSearch from '@/components/filters/VibeSearch'
 import CategoryChips from '@/components/filters/CategoryChips'
 import FilterSheet from '@/components/filters/FilterSheet'
+import FilterPill from '@/components/ui/FilterPill'
 import InterpretationStrip from '@/components/filters/InterpretationStrip'
 import PlaceCard from '@/components/places/PlaceCard'
+import ActiveFilterBanner from '@/components/places/ActiveFilterBanner'
+import MapStrip from '@/components/places/MapStrip'
 import { TASTE_TAGS, INTENT_TAGS, MOMENT_TAGS } from '@/lib/constants/tags'
 import SkeletonCard from '@/components/places/SkeletonCard'
 import CitySelector from '@/components/filters/CitySelector'
@@ -52,6 +55,9 @@ export default function HomeClient() {
   const [interpretedAs, setInterpretedAs] = useState<string | null>(null)
   const [extractedQuery, setExtractedQuery] = useState<ParsedQuery | null>(null)
   const [isSearching, setIsSearching] = useState(false)
+
+  // Map toggle state
+  const [showMap, setShowMap] = useState(false)
 
   // Stable string primitives for deps (avoids new array identity on every render)
   const tasteStr = searchParams.get('taste') ?? ''
@@ -192,10 +198,27 @@ export default function HomeClient() {
     handleTagChange(next)
   }
 
+  function handleRemoveTag(category: 'taste_tags' | 'intent_tags' | 'moment_tags', tag: string) {
+    const next = { ...activeFilters }
+    if (category === 'taste_tags') next.tasteTags = next.tasteTags.filter(t => t !== tag as TasteTag)
+    else if (category === 'intent_tags') next.intentTags = next.intentTags.filter(t => t !== tag as IntentTag)
+    else next.momentTags = next.momentTags.filter(t => t !== tag as MomentTag)
+    handleTagChange(next)
+  }
+
+  function handleClearAllFilters() {
+    handleTagChange({ ...activeFilters, category: 'all', tasteTags: [], intentTags: [], momentTags: [] })
+  }
+
   const hasActiveTagFilters =
     activeFilters.tasteTags.length > 0 ||
     activeFilters.intentTags.length > 0 ||
     activeFilters.momentTags.length > 0
+
+  const activeFilterCount =
+    (activeFilters.tasteTags?.length || 0) +
+    (activeFilters.intentTags?.length || 0) +
+    (activeFilters.momentTags?.length || 0)
 
   const allActiveTags = [
     ...activeFilters.tasteTags,
@@ -241,11 +264,31 @@ export default function HomeClient() {
 
         {!isSearchMode && (
           <>
+            {/* Mobile Filter Strip */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-none px-4 py-2">
+              {/* FilterSheet trigger pill */}
+              <FilterSheet activeTags={activeFilters} onChange={handleTagChange} />
+              {/* Quick vibe chips — first 6 taste tags */}
+              {TASTE_TAGS.slice(0, 6).map(tag => (
+                <FilterPill
+                  key={tag}
+                  label={tag}
+                  active={activeFilters.tasteTags.includes(tag as TasteTag)}
+                  onClick={() => {
+                    const next = { ...activeFilters }
+                    next.tasteTags = next.tasteTags.includes(tag as TasteTag)
+                      ? next.tasteTags.filter(t => t !== tag)
+                      : [...next.tasteTags, tag as TasteTag]
+                    handleTagChange(next)
+                  }}
+                />
+              ))}
+            </div>
+
             <div className="flex items-center gap-2 pb-2 pr-4">
               <div className="flex-1 min-w-0">
                 <CategoryChips activeTags={activeFilters} onChange={handleTagChange} />
               </div>
-              <FilterSheet activeTags={activeFilters} onChange={handleTagChange} />
             </div>
             {(activeFilters.tasteTags.length > 0 || activeFilters.intentTags.length > 0 || activeFilters.momentTags.length > 0) && (
               <div className="overflow-x-auto scrollbar-none border-t border-border/40">
@@ -295,7 +338,10 @@ export default function HomeClient() {
       <div className="flex flex-1">
 
         {/* Desktop sidebar (hidden mobile) */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-72 xl:w-80 lg:flex-shrink-0 lg:sticky lg:top-12 lg:h-[calc(100vh-3rem)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5">
+        <aside
+          className="hidden lg:flex lg:flex-col lg:flex-shrink-0 lg:sticky lg:top-[68px] lg:h-[calc(100vh-68px)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5"
+          style={{ width: 'var(--sidebar-w)' }}
+        >
           {/* Search */}
           <VibeSearch
             value={searchQuery}
@@ -419,11 +465,34 @@ export default function HomeClient() {
           )}
         </p>
 
-        {/* Right: Sort pill (browse mode only) */}
+        {/* Right: Show map toggle + Sort pill (browse mode only) */}
         {!isSearchMode && !isLoading && (
-          <div className="flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1 text-xs font-medium text-foreground shadow-sm">
-            Sort: Featured first
-            <span className="text-warm-gray-mid text-[10px]">▾</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowMap((v) => !v)}
+              className="flex items-center gap-1.5"
+              style={{
+                border: '1.5px solid var(--border)',
+                borderRadius: 20,
+                fontSize: 12,
+                padding: '6px 14px',
+                background: showMap ? 'oklch(0.18 0.01 50)' : 'white',
+                color: showMap ? 'white' : 'var(--text)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+                <line x1="8" y1="2" x2="8" y2="18"/>
+                <line x1="16" y1="6" x2="16" y2="22"/>
+              </svg>
+              Show map
+            </button>
+            <div className="flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1 text-xs font-medium text-foreground shadow-sm">
+              Sort: Featured first
+              <span className="text-warm-gray-mid text-[10px]">▾</span>
+            </div>
           </div>
         )}
       </div>
@@ -448,7 +517,7 @@ export default function HomeClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-[18px]">
               {(searchResults ?? []).map((place, i) => {
                 const isHero = i === 0
                 const isWide = i > 0 && (i - 1) % 5 === 4
@@ -482,7 +551,19 @@ export default function HomeClient() {
             </div>
           ) : (
             <div className="px-4 pb-24 pt-3">
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {/* Active filter banner — desktop only */}
+              <div className="hidden lg:block">
+                <ActiveFilterBanner
+                  activeTags={activeFilters}
+                  onRemoveTag={handleRemoveTag}
+                  onClearAll={handleClearAllFilters}
+                />
+              </div>
+
+              {/* Map strip */}
+              <MapStrip places={allPlaces} visible={showMap} />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-[18px]">
                 {isLoading && allPlaces.length === 0
                   ? Array.from({ length: 6 }).map((_, i) => {
                       const variant: 'hero' | 'wide' | 'default' =

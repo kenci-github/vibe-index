@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const BASE = 'http://localhost:3000'
+const BASE = ''
 
 test.use({ viewport: { width: 390, height: 844 } }) // iPhone 14 viewport
 

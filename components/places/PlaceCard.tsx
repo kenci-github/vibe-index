@@ -3,7 +3,6 @@ import BookmarkButton from '@/components/actions/BookmarkButton'
 import PlaceImage from '@/components/places/PlaceImage'
 import CreatorAttribution from '@/components/places/CreatorAttribution'
 import CuratedBadge from '@/components/ui/CuratedBadge'
-import StarRating from '@/components/ui/StarRating'
 import { FLAG_MAP } from '@/lib/constants/flags'
 import { CATEGORIES } from '@/lib/constants/categories'
 import type { Place } from '@/types'
@@ -114,34 +113,9 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
 
   return (
     <Link href={`/place/${place.id}`} className="group block">
-      <div
-        className="transition-all duration-[220ms] ease-[ease]"
-        style={{
-          borderRadius: 14,
-          border: '1px solid var(--border)',
-          background: 'white',
-          boxShadow: 'var(--shadow-card)',
-        }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget as HTMLDivElement
-          el.style.transform = 'translateY(-2px)'
-          el.style.boxShadow = 'var(--shadow-card-hover)'
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLDivElement
-          el.style.transform = ''
-          el.style.boxShadow = 'var(--shadow-card)'
-        }}
-      >
+      <div className="rounded-[14px] border border-design-border bg-white shadow-[var(--shadow-card)] transition-all duration-[220ms] ease-[ease] hover:-translate-y-[2px] hover:shadow-[var(--shadow-card-hover)]">
         {/* Image container */}
-        <div
-          className="relative overflow-hidden"
-          style={{
-            height: 195,
-            borderRadius: '14px 14px 0 0',
-            position: 'relative',
-          }}
-        >
+        <div className="relative h-[195px] overflow-hidden rounded-t-[14px]">
           {place.thumbnail_url ? (
             <PlaceImage
               src={place.thumbnail_url}
@@ -152,86 +126,42 @@ export default function PlaceCard({ place, searchMode = false, matchedTags = [],
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-stone-200 to-stone-300" />
           )}
-
-          {/* Curated badge */}
-          {place.featured && (
-            <CuratedBadge className="absolute top-2 left-2" />
-          )}
-
-          {/* Bookmark button */}
-          <div className="absolute top-2 right-2">
+          {place.featured && <CuratedBadge className="absolute left-2 top-2" />}
+          <div className="absolute right-2 top-2">
             <BookmarkButton id={place.id} />
           </div>
         </div>
 
         {/* Info area */}
-        <div style={{ padding: '12px 14px 14px' }}>
-          {/* Row 1: name + rating */}
-          <div className="flex items-start justify-between gap-2">
-            <h3
-              className="leading-tight tracking-tight"
-              style={{
-                fontFamily: 'var(--font-jakarta)',
-                fontSize: 14,
-                fontWeight: 700,
-                color: 'var(--text)',
-                flex: 1,
-                minWidth: 0,
-              }}
-            >
-              {place.name}
-            </h3>
-            <StarRating rating={4.7} />
-          </div>
+        <div className="px-[14px] pb-[14px] pt-3">
+          {/* Row 1: name */}
+          <h3 className="truncate text-sm font-bold leading-tight tracking-tight text-design-text font-sans">
+            {place.name}
+          </h3>
 
           {/* Row 2: location */}
-          <p
-            className="truncate"
-            style={{
-              color: 'var(--muted)',
-              fontSize: 11.5,
-              marginTop: 4,
-            }}
-          >
+          <p className="mt-1 truncate text-[11.5px] text-design-muted">
             📍 {locationLine}
           </p>
 
           {/* Row 3: taste tags + category */}
-          <div className="flex items-center justify-between gap-1 mt-2">
-            {/* Taste tags */}
-            <div className="flex gap-1 flex-wrap min-w-0">
+          <div className="mt-2 flex items-center justify-between gap-1">
+            <div className="flex min-w-0 flex-wrap gap-1">
               {(place.taste_tags ?? []).slice(0, 2).map((tag) => (
                 <span
                   key={tag}
-                  style={{
-                    background: 'var(--accent-light)',
-                    color: 'var(--accent)',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    borderRadius: 20,
-                    padding: '2px 8px',
-                  }}
+                  className="rounded-[20px] bg-[var(--accent-light)] px-2 py-0.5 text-[10px] font-semibold text-accent"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-
-            {/* Category / intent type */}
             {categoryLabel && (
-              <span
-                className="shrink-0"
-                style={{
-                  color: 'var(--dim)',
-                  fontSize: 10.5,
-                }}
-              >
-                {categoryLabel}
-              </span>
+              <span className="shrink-0 text-[10.5px] text-design-dim">{categoryLabel}</span>
             )}
           </div>
 
-          {/* Creator attribution (if any) */}
+          {/* Creator attribution */}
           {place.creator_handle && place.creator_platform && (
             <div className="mt-2">
               <CreatorAttribution

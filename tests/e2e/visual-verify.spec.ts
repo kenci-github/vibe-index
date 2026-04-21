@@ -35,7 +35,7 @@ test.describe('Mobile 390px visual checks', () => {
     });
 
     // 1. Page responds
-    expect(page.url()).toContain('localhost:3000');
+    expect(page.url()).toContain('localhost');
   });
 
   test('header: wordmark, tagline, saved button', async ({ page }) => {
@@ -217,7 +217,7 @@ test.describe('Desktop 1280px visual checks', () => {
     await page.waitForSelector('a[href^="/place/"]', { timeout: 20000 }).catch(() => {});
 
     // Wordmark
-    const wordmark = page.locator('text=Vibe Index').first();
+    const wordmark = page.locator('nav a[href="/"]').first();
     await expect(wordmark).toBeVisible();
     const wordmarkBox = await wordmark.boundingBox();
 

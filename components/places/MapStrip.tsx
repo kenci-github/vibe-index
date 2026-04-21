@@ -1,3 +1,5 @@
+'use client'
+
 import type { Place } from '@/types'
 
 interface MapStripProps {

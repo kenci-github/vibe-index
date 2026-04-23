@@ -180,6 +180,25 @@ export default function HomeClient() {
     setExtractedQuery(null)
   }
 
+  // Listen for search events dispatched by TopNavSearch (desktop header)
+  useEffect(() => {
+    function onVibeSearch(e: Event) {
+      const q = (e as CustomEvent<{ query: string }>).detail.query
+      setSearchQuery(q)
+      runSearch(q)
+    }
+    function onVibeSearchClear() {
+      clearSearch()
+    }
+    window.addEventListener('vibe-search', onVibeSearch)
+    window.addEventListener('vibe-search-clear', onVibeSearchClear)
+    return () => {
+      window.removeEventListener('vibe-search', onVibeSearch)
+      window.removeEventListener('vibe-search-clear', onVibeSearchClear)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function toggleSidebarTag(tag: string, type: 'taste' | 'intent' | 'moment') {
     const next = { ...activeFilters }
     if (type === 'taste') {
@@ -339,38 +358,31 @@ export default function HomeClient() {
 
         {/* Desktop sidebar (hidden mobile) */}
         <aside
-          className="hidden lg:flex lg:flex-col lg:flex-shrink-0 lg:sticky lg:top-[68px] lg:h-[calc(100vh-68px)] lg:overflow-y-auto lg:border-r lg:border-border/50 lg:px-6 lg:py-6 lg:gap-5"
-          style={{ width: 'var(--sidebar-w)' }}
+          className="hidden lg:flex lg:flex-col lg:flex-shrink-0 lg:sticky lg:top-[68px] lg:h-[calc(100vh-68px)] lg:overflow-y-auto lg:border-r lg:border-border"
+          style={{ width: 'var(--sidebar-w)', padding: '22px 18px', background: 'white', gap: 0 }}
         >
-          {/* Search */}
-          <VibeSearch
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSearch={runSearch}
-            onClear={clearSearch}
-            isSearching={isSearching}
-          />
-
           {/* City */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">City</p>
+          <div style={{marginBottom:22}}>
+            <p style={{fontSize:9.5,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}>City</p>
             <CitySelector cities={cities} selectedCityId={cityId} onSelect={handleCitySelect} />
           </div>
 
           {/* Vibe */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">Vibe</p>
-            <div className="flex flex-wrap gap-1.5">
+          <div style={{marginBottom:22}}>
+            <p style={{fontSize:9.5,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:9}}>Vibe</p>
+            <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
               {TASTE_TAGS.map(tag => (
                 <button
                   key={tag}
                   onClick={() => toggleSidebarTag(tag, 'taste')}
-                  className={cn(
-                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
-                    activeFilters.tasteTags.includes(tag as TasteTag)
-                      ? 'bg-accent border-accent text-white'
-                      : 'bg-white border-border text-warm-gray-mid hover:border-foreground/30'
-                  )}
+                  style={{
+                    padding:'6px 14px',borderRadius:20,flexShrink:0,whiteSpace:'nowrap',
+                    border:`1.5px solid ${activeFilters.tasteTags.includes(tag as TasteTag)?'var(--accent)':'var(--border)'}`,
+                    background:activeFilters.tasteTags.includes(tag as TasteTag)?'var(--accent-light)':'transparent',
+                    color:activeFilters.tasteTags.includes(tag as TasteTag)?'var(--accent)':'oklch(0.38 0.01 50)',
+                    fontSize:12,fontWeight:activeFilters.tasteTags.includes(tag as TasteTag)?600:400,
+                    transition:'all 0.14s ease',cursor:'pointer',
+                  }}
                 >
                   {tag}
                 </button>
@@ -379,19 +391,21 @@ export default function HomeClient() {
           </div>
 
           {/* Intent */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">Intent</p>
-            <div className="flex flex-wrap gap-1.5">
+          <div style={{marginBottom:22}}>
+            <p style={{fontSize:9.5,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:9}}>Intent</p>
+            <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
               {INTENT_TAGS.map(tag => (
                 <button
                   key={tag}
                   onClick={() => toggleSidebarTag(tag, 'intent')}
-                  className={cn(
-                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
-                    activeFilters.intentTags.includes(tag as IntentTag)
-                      ? 'bg-accent border-accent text-white'
-                      : 'bg-white border-border text-warm-gray-mid hover:border-foreground/30'
-                  )}
+                  style={{
+                    padding:'6px 14px',borderRadius:20,flexShrink:0,whiteSpace:'nowrap',
+                    border:`1.5px solid ${activeFilters.intentTags.includes(tag as IntentTag)?'var(--accent)':'var(--border)'}`,
+                    background:activeFilters.intentTags.includes(tag as IntentTag)?'var(--accent-light)':'transparent',
+                    color:activeFilters.intentTags.includes(tag as IntentTag)?'var(--accent)':'oklch(0.38 0.01 50)',
+                    fontSize:12,fontWeight:activeFilters.intentTags.includes(tag as IntentTag)?600:400,
+                    transition:'all 0.14s ease',cursor:'pointer',
+                  }}
                 >
                   {tag.replace(/-/g, ' ')}
                 </button>
@@ -400,19 +414,21 @@ export default function HomeClient() {
           </div>
 
           {/* Moment */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-warm-gray-mid mb-2">Moment</p>
-            <div className="flex flex-wrap gap-1.5">
+          <div style={{marginBottom:22}}>
+            <p style={{fontSize:9.5,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:9}}>Moment</p>
+            <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
               {MOMENT_TAGS.map(tag => (
                 <button
                   key={tag}
                   onClick={() => toggleSidebarTag(tag, 'moment')}
-                  className={cn(
-                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
-                    activeFilters.momentTags.includes(tag as MomentTag)
-                      ? 'bg-accent border-accent text-white'
-                      : 'bg-white border-border text-warm-gray-mid hover:border-foreground/30'
-                  )}
+                  style={{
+                    padding:'6px 14px',borderRadius:20,flexShrink:0,whiteSpace:'nowrap',
+                    border:`1.5px solid ${activeFilters.momentTags.includes(tag as MomentTag)?'var(--accent)':'var(--border)'}`,
+                    background:activeFilters.momentTags.includes(tag as MomentTag)?'var(--accent-light)':'transparent',
+                    color:activeFilters.momentTags.includes(tag as MomentTag)?'var(--accent)':'oklch(0.38 0.01 50)',
+                    fontSize:12,fontWeight:activeFilters.momentTags.includes(tag as MomentTag)?600:400,
+                    transition:'all 0.14s ease',cursor:'pointer',
+                  }}
                 >
                   {tag.replace(/-/g, ' ')}
                 </button>
@@ -424,7 +440,7 @@ export default function HomeClient() {
           {hasActiveTagFilters && (
             <button
               onClick={() => handleTagChange({ ...activeFilters, category: 'all', tasteTags: [], intentTags: [], momentTags: [] })}
-              className="text-sm font-semibold text-accent text-left"
+              style={{background:'none',border:'none',color:'var(--accent)',fontSize:12.5,fontWeight:600,textDecoration:'underline',textUnderlineOffset:2,padding:'2px 0',cursor:'pointer'}}
             >
               Clear all filters
             </button>
@@ -499,7 +515,7 @@ export default function HomeClient() {
 
       {/* Content */}
       {isSearchMode ? (
-        <div className={cn('px-4 pb-24 pt-3', isSearching && 'opacity-50 pointer-events-none transition-opacity duration-200')}>
+        <div className={cn('pb-24 pt-[22px] px-[28px]', isSearching && 'opacity-50 pointer-events-none transition-opacity duration-200')}>
           {searchResults && searchResults.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-4 py-20 text-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/8">
@@ -517,17 +533,10 @@ export default function HomeClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-[18px]">
-              {(searchResults ?? []).map((place, i) => {
-                const isHero = i === 0
-                const isWide = i > 0 && (i - 1) % 5 === 4
-                const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
-                return (
-                  <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
-                    <PlaceCard place={place} searchMode={true} matchedTags={getMatchedTags(place, extractedQuery)} variant={variant} />
-                  </div>
-                )
-              })}
+            <div className="grid gap-[18px]" style={{gridTemplateColumns:'repeat(auto-fill,minmax(230px,1fr))'}}>
+              {(searchResults ?? []).map((place) => (
+                <PlaceCard key={place.id} place={place} searchMode={true} matchedTags={getMatchedTags(place, extractedQuery)} />
+              ))}
             </div>
           )}
         </div>
@@ -563,30 +572,16 @@ export default function HomeClient() {
               {/* Map strip */}
               <MapStrip places={allPlaces} visible={showMap} />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-[18px]">
+              <div className="grid gap-[18px]" style={{gridTemplateColumns:'repeat(auto-fill,minmax(230px,1fr))'}}>
                 {isLoading && allPlaces.length === 0
-                  ? Array.from({ length: 6 }).map((_, i) => {
-                      const variant: 'hero' | 'wide' | 'default' =
-                        i === 0 ? 'hero' : (i - 1) % 5 === 4 ? 'wide' : 'default'
-                      const colClass = variant !== 'default' ? 'col-span-2 lg:col-span-1' : ''
-                      return (
-                        <div key={i} className={colClass}>
-                          <SkeletonCard variant={variant} />
-                        </div>
-                      )
-                    })
+                  ? Array.from({ length: 6 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
                   : allPlaces.flatMap((place, i) => {
-                      const isHero = i === 0
-                      const isWide = i > 0 && (i - 1) % 5 === 4
-                      const variant = isHero ? 'hero' : isWide ? 'wide' : 'default'
-                      const card = (
-                        <div key={place.id} className={isHero ? 'col-span-2 lg:col-span-1' : isWide ? 'col-span-2 lg:col-span-1' : ''}>
-                          <PlaceCard place={place} variant={variant} />
-                        </div>
-                      )
+                      const card = <PlaceCard key={place.id} place={place} />
                       if (i === 9) {
                         return [card, (
-                          <div key="submit-cta" className="col-span-2 lg:col-span-3 xl:col-span-4">
+                          <div key="submit-cta" className="md:col-span-2 lg:col-span-3">
                             <div className="flex flex-col items-center gap-4 rounded-2xl border border-accent/20 bg-accent/[0.06] px-6 py-8 text-center">
                               <p className="text-2xl text-accent">✦</p>
                               <div className="space-y-1">

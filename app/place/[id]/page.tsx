@@ -82,7 +82,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
       <div className="mx-auto max-w-5xl lg:grid lg:grid-cols-[1fr_1fr] lg:gap-8 lg:px-8 lg:items-start">
 
         {/* Left col: hero image */}
-        <div className="relative h-[55vh] lg:h-auto lg:aspect-[3/4] w-full overflow-hidden bg-gray-200 lg:rounded-2xl lg:sticky lg:top-24">
+        <div className="relative h-[55vh] lg:h-auto lg:aspect-[3/4] w-full overflow-hidden bg-gray-200 lg:rounded-2xl lg:sticky lg:top-24 min-w-0">
           {place.thumbnail_url ? (
             <PlaceImage
               src={place.thumbnail_url}
@@ -125,7 +125,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
         </div>
 
         {/* Right col: content */}
-        <div className="px-4 pt-5 lg:px-0 lg:pt-0">
+        <div className="px-4 pt-5 lg:px-0 lg:pt-0 min-w-0">
 
           {/* Desktop: name + location + actions */}
           <div className="hidden lg:block mb-5">

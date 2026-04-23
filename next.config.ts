@@ -4,7 +4,6 @@ const isDev = process.env.NODE_ENV === 'development'
 
 const csp = [
   "default-src 'self'",
-  // Next.js requires unsafe-inline for styles; unsafe-eval only needed in dev (hot reload)
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
@@ -25,6 +24,9 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: __dirname,
+  },
   poweredByHeader: false,
   images: {
     remotePatterns: [

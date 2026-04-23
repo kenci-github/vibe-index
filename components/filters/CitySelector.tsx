@@ -14,6 +14,12 @@ interface CitySelectorProps {
   onSelect: (cityId: string | null) => void
 }
 
+const Chevron = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, color: 'var(--dim)' }}>
+    <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
 export default function CitySelector({ cities, selectedCityId, onSelect }: CitySelectorProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -23,7 +29,7 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
 
   useEffect(() => {
     setMounted(true)
-    const check = () => setIsMobile(window.innerWidth < 768)
+    const check = () => setIsMobile(window.innerWidth < 1024)
     check()
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
@@ -36,9 +42,7 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   }, [open])
 
   const selectedCity = cities.find((c) => c.id === selectedCityId)
-  const triggerLabel = selectedCity
-    ? `${FLAG_MAP[selectedCity.country.code] ?? ''} ${selectedCity.name}`
-    : 'Explore Everywhere'
+  const triggerLabel = selectedCity ? selectedCity.name : 'Explore Everywhere'
 
   const filtered = search.trim()
     ? cities.filter(
@@ -60,57 +64,99 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
   )
   const groups = Object.values(grouped).sort((a, b) => a.country.name.localeCompare(b.country.name))
 
-  function closeSheet() {
+  function close() {
     setOpen(false)
     setSearch('')
   }
 
   function handleSelect(cityId: string | null) {
-    // TODO: if city.active === false, show WaitlistForm instead of selecting
-    // Currently unreachable via normal UI — getCities() returns active cities only
     logEvent({ event_type: 'city_selected', city_id: cityId ?? undefined })
     onSelect(cityId)
-    closeSheet()
+    close()
   }
 
-  // Desktop: styled select
+  // ── Desktop: custom dropdown matching prototype ──────────────────────────────
   if (!isMobile) {
     return (
-      <div className="relative inline-block">
-        <select
-          value={selectedCityId ?? ''}
-          onChange={(e) => handleSelect(e.target.value || null)}
-          className="appearance-none rounded-full border border-gray-200 bg-white py-2 pl-4 pr-8 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-accent/30"
+      <div style={{ position: 'relative' }}>
+        <button
+          onClick={() => setOpen(!open)}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 13px', border: '1.5px solid var(--border)',
+            borderRadius: 11, background: 'var(--surface)',
+            fontSize: 13, fontWeight: 600, cursor: 'pointer',
+          }}
         >
-          <option value="">Explore Everywhere</option>
-          {cities.map((city) => (
-            <option key={city.id} value={city.id}>
-              {city.name}, {city.country.name}
-            </option>
-          ))}
-        </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-          ▾
-        </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 15 }}>🌐</span>
+            {triggerLabel}
+          </span>
+          <Chevron />
+        </button>
+
+        {open && (
+          <>
+            <div onClick={close} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 5px)', left: 0, right: 0,
+              background: 'white', border: '1px solid var(--border)', borderRadius: 11,
+              boxShadow: '0 8px 24px oklch(0 0 0/0.1)', overflow: 'hidden', zIndex: 50,
+            }}>
+              {/* Explore Everywhere */}
+              <div
+                onClick={() => handleSelect(null)}
+                style={{
+                  padding: '10px 13px', fontSize: 12.5, cursor: 'pointer',
+                  background: selectedCityId === null ? 'var(--accent-light)' : 'transparent',
+                  color: selectedCityId === null ? 'var(--accent)' : 'inherit',
+                  fontWeight: selectedCityId === null ? 600 : 400,
+                  transition: 'background 0.1s',
+                }}
+                onMouseEnter={e => { if (selectedCityId !== null) (e.currentTarget as HTMLElement).style.background = 'var(--surface)' }}
+                onMouseLeave={e => { if (selectedCityId !== null) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+              >
+                🌐 Explore Everywhere
+              </div>
+
+              {/* Cities */}
+              {cities.map((city) => {
+                const active = city.id === selectedCityId
+                return (
+                  <div
+                    key={city.id}
+                    onClick={() => handleSelect(city.id)}
+                    style={{
+                      padding: '10px 13px', fontSize: 12.5, cursor: 'pointer',
+                      background: active ? 'var(--accent-light)' : 'transparent',
+                      color: active ? 'var(--accent)' : 'inherit',
+                      fontWeight: active ? 600 : 400,
+                      transition: 'background 0.1s',
+                    }}
+                    onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'var(--surface)' }}
+                    onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                  >
+                    {FLAG_MAP[city.country.code] ?? ''} {city.name}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
       </div>
     )
   }
 
-  // Mobile: bottom sheet
-  // NOTE: backdrop + sheet are portalled to document.body to escape the sticky
-  // header's backdrop-filter stacking context (which would clip fixed children).
+  // ── Mobile: bottom sheet ─────────────────────────────────────────────────────
   const sheet = (
     <>
-      {/* Backdrop */}
       <div
-        onClick={closeSheet}
+        onClick={close}
         className={cn(
           'fixed inset-0 z-40 bg-black/40 transition-opacity duration-300',
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
       />
-
-      {/* Sheet */}
       <div
         role="dialog"
         aria-modal="true"
@@ -120,12 +166,9 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
           open ? 'translate-y-0' : 'translate-y-full'
         )}
       >
-        {/* Drag handle */}
         <div className="flex justify-center pb-2 pt-3">
           <div className="h-1 w-10 rounded-full bg-gray-200" />
         </div>
-
-        {/* Search */}
         <div className="px-4 pb-3">
           <div className="flex items-center gap-2 rounded-xl bg-gray-100 px-3 py-2">
             <span className="text-gray-400 text-sm">🔍</span>
@@ -138,16 +181,11 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
               className="flex-1 bg-transparent text-base text-gray-800 placeholder-gray-400 focus:outline-none"
             />
             {search && (
-              <button onClick={() => setSearch('')} className="text-xs text-gray-400">
-                ✕
-              </button>
+              <button onClick={() => setSearch('')} className="text-xs text-gray-400">✕</button>
             )}
           </div>
         </div>
-
-        {/* City list */}
         <div className="flex-1 overflow-y-auto">
-          {/* Explore Everywhere */}
           <button
             onClick={() => handleSelect(null)}
             className={cn(
@@ -159,8 +197,6 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
             <span className="flex-1 text-sm">Explore Everywhere</span>
             {selectedCityId === null && <Check className="h-4 w-4 text-accent" />}
           </button>
-
-          {/* Grouped cities */}
           {groups.map(({ country, cities: groupCities }) => (
             <div key={country.id}>
               <div className="flex items-center gap-2 bg-gray-50 px-5 py-2">
@@ -187,12 +223,9 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
               })}
             </div>
           ))}
-
           {groups.length === 0 && (
             <div className="px-5 py-8 text-center text-sm text-gray-400">No cities found</div>
           )}
-
-          {/* Bottom padding for safe area */}
           <div className="h-8" />
         </div>
       </div>
@@ -201,16 +234,21 @@ export default function CitySelector({ cities, selectedCityId, onSelect }: CityS
 
   return (
     <>
-      {/* Trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-accent/50 active:scale-95"
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 13px', border: '1.5px solid var(--border)',
+          borderRadius: 11, background: 'var(--surface)',
+          fontSize: 13, fontWeight: 600, cursor: 'pointer',
+        }}
       >
-        <span>{triggerLabel}</span>
-        <span className="text-xs text-gray-400">▾</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 15 }}>🌐</span>
+          {triggerLabel}
+        </span>
+        <Chevron />
       </button>
-
-      {/* Portal backdrop + sheet to body to escape sticky header backdrop-filter stacking context */}
       {mounted && createPortal(sheet, document.body)}
     </>
   )
